@@ -120,11 +120,15 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+
+FRONTEND_URLS = config('FRONTEND_URL', default='http://localhost:3000')
+
 CORS_ALLOWED_ORIGINS = [
-    config('FRONTEND_URL', default='http://localhost:3000'),
- 
+    origin.strip() for origin in FRONTEND_URLS.split(',')
 ]
 
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 
 
 
@@ -171,5 +175,3 @@ if GS_BUCKET_NAME:
         },
     }
 
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOW_CREDENTIALS = True
