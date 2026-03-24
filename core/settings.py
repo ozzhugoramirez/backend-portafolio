@@ -147,25 +147,24 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 GS_BUCKET_NAME = config('GS_BUCKET_NAME', default='')
 
 if GS_BUCKET_NAME:
-    credenciales_path = os.path.join(BASE_DIR, config('GOOGLE_APPLICATION_CREDENTIALS'))
+    # Traemos lo que sea que haya en el .env (el nombre del archivo local, o el texto largo de Render)
+    google_creds = config('GOOGLE_APPLICATION_CREDENTIALS', default='')
+    
+    # 📚 EL TRUCO: Si el texto empieza con '{', significa que estamos en Render con el JSON crudo
+    if google_creds.startswith('{'):
+        credenciales_path = os.path.join(BASE_DIR, 'google-creds-temp.json')
+        # Creamos el archivo temporalmente en el servidor de Render
+        with open(credenciales_path, 'w') as archivo:
+            archivo.write(google_creds)
+    else:
+        # Si no empieza con '{', significa que estamos en local y es solo el nombre del archivo
+        credenciales_path = os.path.join(BASE_DIR, google_creds)
+        
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credenciales_path
     
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
-else:
-    
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
