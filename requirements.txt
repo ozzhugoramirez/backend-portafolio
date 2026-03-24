@@ -1,0 +1,27 @@
+# ==========================================
+# 1. CORE DE DJANGO Y UTILIDADES
+# ==========================================
+Django>=6.0.3
+python-decouple>=3.8
+Pillow>=10.2.0
+
+# ==========================================
+# 2. API Y AUTENTICACIÓN
+# ==========================================
+djangorestframework>=3.15.1
+django-cors-headers>=4.3.1
+djangorestframework-simplejwt>=5.3.1
+
+# ==========================================
+# 3. ALMACENAMIENTO EN LA NUBE (GOOGLE)
+# ==========================================
+django-storages>=1.14.2
+google-cloud-storage>=2.14.0
+
+# ==========================================
+# 4. BASE DE DATOS Y PRODUCCIÓN (RENDER)
+# ==========================================
+gunicorn>=21.2.0
+psycopg2-binary>=2.9.9
+dj-database-url>=2.1.0
+whitenoise>=6.6.0
