@@ -140,7 +140,7 @@ class Project(models.Model):
     gradient_class = models.CharField(max_length=100, default="from-zinc-800 via-zinc-900 to-black")
     image_main = models.ImageField(upload_to='projects/main/', blank=True, null=True)
     
-    # 👉 NUEVO: Campo para YouTube
+   
     youtube_url = models.URLField(blank=True, null=True, help_text="Ej: https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
     tech_stack = models.JSONField(default=list, blank=True)
@@ -157,7 +157,7 @@ class Project(models.Model):
     analysis_text = models.TextField(blank=True)
     core_code = models.TextField(blank=True)
     
-    # ⚠️ ELIMINAMOS EL CAMPO GALLERY DE ACÁ PORQUE AHORA ES UN MODELO APARTE
+    
 
     is_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -170,7 +170,7 @@ class Project(models.Model):
         return f"{self.title} ({self.category})"
 
 
-# 👉 NUEVO: Modelo para subir múltiples imágenes por proyecto
+
 class ProjectGalleryImage(models.Model):
     project = models.ForeignKey(Project, related_name='gallery', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='projects/gallery/')
@@ -191,22 +191,18 @@ class LabSnippet(models.Model):
     category = models.CharField(max_length=100, help_text="Para filtrar en el sidebar (Ej: Ciberseguridad, Cloud, Scripts)")
     description = models.TextField(help_text="Descripción de para qué sirve este fragmento.")
     
-    # El código crudo
-    code = models.TextField(help_text="El fragmento de código, script o prompt.")
     
-    # Metadatos visuales
+    code = models.TextField(help_text="El fragmento de código, script o prompt.")
     language = models.CharField(max_length=50, default="bash", help_text="Lenguaje para el syntax (Ej: bash, json, text, python)")
     icon_name = models.CharField(max_length=50, default="terminal", help_text="Ícono Lucide (Ej: shield, cloud, terminal, sparkles)")
     
-    # Usamos JSONField para los tags porque es una simple lista de palabras
+   
     tags = models.JSONField(default=list, blank=True, help_text='Ej: ["linux", "ufw", "security"]')
-    
-    # Estado y Orden
     is_public = models.BooleanField(default=True, help_text="Si es False, se oculta del Lab público")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['-created_at'] # Los más nuevos aparecen primero por defecto
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"[{self.category}] {self.title}"
@@ -215,23 +211,21 @@ class LabSnippet(models.Model):
 
 
 
+
 class TelemetryEvent(models.Model):
-    # Acciones principales: 'view' (ver página), 'click' (redes sociales), 'download' (CV)
-    action = models.CharField(max_length=50, help_text="Ej: view, click, download")
     
-    # El objetivo de la acción: 'home', 'github', 'cv', 'proyecto-vexa', etc.
+    action = models.CharField(max_length=50, help_text="Ej: view, click, download")
     target = models.CharField(max_length=100, help_text="Ej: home, cv, github, silo-ecommerce")
     
-    # Cuándo ocurrió
+   
+    ip_address = models.GenericIPAddressField(null=True, blank=True, help_text="Para evitar spam de F5")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"[{self.action}] {self.target} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
-
-
+        return f"[{self.action}] {self.target} - IP: {self.ip_address} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
 
 
 class ContactMessage(models.Model):

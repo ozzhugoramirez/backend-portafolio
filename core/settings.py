@@ -11,7 +11,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
-
+RECAPTCHA_SECRET_KEY = config('RECAPTCHA_SECRET_KEY')
 
 # Application definition
 
@@ -96,13 +96,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# settings.py
 
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = 'es-ar' 
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
-
-USE_TZ = True
+USE_TZ = True 
 
 REST_FRAMEWORK = {
     
@@ -151,17 +150,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 GS_BUCKET_NAME = config('GS_BUCKET_NAME', default='')
 
 if GS_BUCKET_NAME:
-    # Traemos lo que sea que haya en el .env (el nombre del archivo local, o el texto largo de Render)
     google_creds = config('GOOGLE_APPLICATION_CREDENTIALS', default='')
     
-    # 📚 EL TRUCO: Si el texto empieza con '{', significa que estamos en Render con el JSON crudo
+    
     if google_creds.startswith('{'):
         credenciales_path = os.path.join(BASE_DIR, 'google-creds-temp.json')
-        # Creamos el archivo temporalmente en el servidor de Render
+        
         with open(credenciales_path, 'w') as archivo:
             archivo.write(google_creds)
     else:
-        # Si no empieza con '{', significa que estamos en local y es solo el nombre del archivo
         credenciales_path = os.path.join(BASE_DIR, google_creds)
         
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credenciales_path

@@ -30,5 +30,4 @@ class ProjectSerializer(serializers.ModelSerializer):
 class ContactMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactMessage
-        # Agregamos id, created_at e is_read
         fields = ['id', 'name', 'email', 'subject', 'message', 'created_at', 'is_read']
