@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-
+GEMINI_API_KEY = config("GEMINI_API_KEY")
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 RECAPTCHA_SECRET_KEY = config('RECAPTCHA_SECRET_KEY')
 
@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'corsheaders', 
     'rest_framework_simplejwt',
     'api',
+    'chat',
 ]
 
 MIDDLEWARE = [
