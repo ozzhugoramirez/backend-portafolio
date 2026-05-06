@@ -153,7 +153,11 @@ WEBAUTHN_EXPECTED_ORIGIN = 'http://localhost:3000'
 
 WEBAUTHN_RP_ID = 'devsebastian.com' 
 WEBAUTHN_RP_NAME = 'Sebastian Villalba - Admin'
-WEBAUTHN_EXPECTED_ORIGIN = 'https://devsebastian.com'
+
+WEBAUTHN_EXPECTED_ORIGIN = [
+    'https://devsebastian.com',
+    'https://www.devsebastian.com'
+]
 
 CACHES = {
     'default': {
