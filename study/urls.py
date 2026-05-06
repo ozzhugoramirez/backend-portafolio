@@ -7,7 +7,7 @@ urlpatterns = [
     path('notebooks/', NotebookManagerView.as_view(), name='notebooks_create'),
     path('projects/', ProjectManagerView.as_view(), name='projects_create'),
     
-    # --- LA RUTA QUE FALTABA ---
+    # Rutas de Prompts
     path('prompts/', CustomPromptsView.as_view(), name='custom_prompts'), 
     
     # Rutas del Chat

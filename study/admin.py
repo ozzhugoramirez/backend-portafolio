@@ -9,3 +9,5 @@ admin.site.register(ChatSession)
 admin.site.register(GlobalMemory)
 admin.site.register(Notebook)
 admin.site.register(Project)
+admin.site.register(Passkey)
+

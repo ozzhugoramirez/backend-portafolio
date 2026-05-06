@@ -145,6 +145,25 @@ DESTINATION_EMAIL = config('DESTINATION_EMAIL', default=EMAIL_HOST_USER)
 
 
 
+"""
+WEBAUTHN_RP_ID = 'localhost' 
+WEBAUTHN_RP_NAME = 'Admin DevSebastian'
+WEBAUTHN_EXPECTED_ORIGIN = 'http://localhost:3000'
+"""
+
+WEBAUTHN_RP_ID = 'devsebastian.com' 
+WEBAUTHN_RP_NAME = 'Sebastian Villalba - Admin'
+WEBAUTHN_EXPECTED_ORIGIN = 'https://devsebastian.com'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'webauthn-challenges',
+    }
+}
+
+
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

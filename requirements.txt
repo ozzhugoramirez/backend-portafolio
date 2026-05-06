@@ -4,6 +4,7 @@
 Django>=6.0.3
 python-decouple>=3.8
 Pillow>=10.2.0
+webauthn>=2.7.1
 
 # ==========================================
 # 2. API Y AUTENTICACIÓN

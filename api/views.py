@@ -16,40 +16,48 @@ from django.utils import timezone
 import logging
 from datetime import timedelta
 from django.db.models.functions import TruncWeek
-
-
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
+import logging
 
 logger = logging.getLogger(__name__)
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
 
-        
-        if response.status_code == 200:
-            usuario = request.data.get('username', 'Administrador')
+
+class CustomLoginAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        usuario_input = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=usuario_input, password=password)
+
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
             
             user_agent = request.META.get('HTTP_USER_AGENT', 'Dispositivo desconocido')
-            
-            
             x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
             if x_forwarded_for:
                 ip_address = x_forwarded_for.split(',')[0]
             else:
                 ip_address = request.META.get('REMOTE_ADDR', 'IP desconocida')
 
-            # Formateamos la fecha a hora local
             fecha_hora = timezone.localtime(timezone.now()).strftime("%d/%m/%Y %H:%M:%S")
 
-          
             asunto = f"Alerta de Seguridad: Nuevo inicio de sesión en devsebastian.com"
-            cuerpo_texto = f"Se detectó un nuevo inicio de sesión.\nUsuario: {usuario}\nFecha: {fecha_hora}\nIP: {ip_address}\nDispositivo: {user_agent}"
+            cuerpo_texto = f"Se detectó un nuevo inicio de sesión.\nUsuario: {usuario_input}\nFecha: {fecha_hora}\nIP: {ip_address}\nDispositivo: {user_agent}"
             
             cuerpo_html = f"""
             <div style="background-color: #f5f5f7; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
                 <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border-radius: 18px; padding: 40px; border: 1px solid #d2d2d7; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                    
                     <div style="text-align: center; margin-bottom: 24px;">
                         <h1 style="color: #1d1d1f; font-size: 24px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.022em;">
                             Alerta de Seguridad
@@ -62,7 +70,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     <div style="background-color: #f5f5f7; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
                         <p style="margin: 0 0 12px 0; font-size: 14px;">
                             <strong style="color: #1d1d1f; display: block; margin-bottom: 2px;">Usuario</strong>
-                            <span style="color: #515154;">{usuario}</span>
+                            <span style="color: #515154;">{usuario_input}</span>
                         </p>
                         <p style="margin: 0 0 12px 0; font-size: 14px;">
                             <strong style="color: #1d1d1f; display: block; margin-bottom: 2px;">Fecha y Hora</strong>
@@ -83,7 +91,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                     </p>
 
                     <hr style="border: 0; border-top: 1px solid #d2d2d7; margin: 32px 0 20px 0;">
-                    
                     <p style="color: #86868b; font-size: 12px; text-align: center; margin: 0;">
                         Sistema de Seguridad &bull; devsebastian.com
                     </p>
@@ -91,7 +98,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             </div>
             """
 
-       
             try:
                 send_mail(
                     subject=asunto,
@@ -104,11 +110,13 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             except Exception as e:
                 logger.error(f"Error enviando alerta de seguridad: {e}")
 
-   
-        return response
-
-
-
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'username': user.username
+            }, status=status.HTTP_200_OK)
+            
+        return Response({'detail': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class ProfileAPIView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]

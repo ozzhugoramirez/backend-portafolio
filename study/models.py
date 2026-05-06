@@ -4,6 +4,26 @@ from django.contrib.auth.models import User
 
 # --- PERFIL Y PROMPTS ---
 
+
+
+class Passkey(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='passkeys')
+    name = models.CharField(max_length=255, help_text="Ej: iPhone de Seba")
+    credential_id = models.TextField(unique=True, help_text="ID de la credencial en Base64URL")
+    public_key = models.TextField(help_text="Llave pública en Base64URL")
+    sign_count = models.IntegerField(default=0, help_text="Contador de firmas para evitar clonación")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.user.username}"
+
+
+
+
+
+
+
+
 class AIProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='ai_profile')
     ai_name = models.CharField(max_length=50, default="olo")
