@@ -1,6 +1,26 @@
 from rest_framework import serializers
 from .models import *
 
+class TimelineMediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimelineMedia
+        fields = ['id', 'file', 'caption', 'uploaded_at']
+
+class TimelineEventSerializer(serializers.ModelSerializer):
+   
+    media = TimelineMediaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = TimelineEvent
+        fields = [
+            'id', 'title', 'slug', 'event_date', 
+            'brief_description', 'content', 'media', 
+            'created_at', 'updated_at'
+        ]
+
+
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile

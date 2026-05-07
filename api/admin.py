@@ -7,3 +7,6 @@ admin.site.register(LabSnippet)
 admin.site.register(ProjectGalleryImage)
 admin.site.register(TelemetryEvent)
 admin.site.register(ContactMessage)
+
+admin.site.register(TimelineEvent)
+admin.site.register(TimelineMedia)

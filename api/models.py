@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 def default_work_philosophy():
     return [
@@ -243,3 +244,43 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.subject}"
+
+
+
+
+
+
+class TimelineEvent(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True, max_length=250)
+    
+  
+    event_date = models.DateField(help_text="Fecha real en la que ocurrió el evento")
+    
+    brief_description = models.TextField(help_text="Resumen corto para la vista principal")
+    content = models.TextField(help_text="Todo el detalle, lo que aprendiste, etc.")
+    
+   
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-event_date']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.event_date} | {self.title}"
+
+
+class TimelineMedia(models.Model):
+    event = models.ForeignKey(TimelineEvent, related_name='media', on_delete=models.CASCADE)
+    file = models.FileField(upload_to='timeline_media/')
+    caption = models.CharField(max_length=150, blank=True, help_text="Pie de foto opcional")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Media for {self.event.title}"

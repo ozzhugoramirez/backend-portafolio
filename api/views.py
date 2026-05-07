@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import Profile, Project, LabSnippet, ProjectGalleryImage, TelemetryEvent
+from .models import *
 from .serializers import *
 from django.core.mail import send_mail
 from django.conf import settings
@@ -470,3 +470,78 @@ class ContactAPIView(APIView):
             return Response({"message": "Mensaje enviado exitosamente."}, status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+class TimelineListCreateAPIView(APIView):
+    # Cualquiera puede leer (GET), pero solo vos (logueado) podés crear (POST)
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request):
+        # Como definimos ordering=['-event_date'] en el modelo, ya vienen ordenados perfectos.
+        events = TimelineEvent.objects.all()
+        serializer = TimelineEventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = TimelineEventSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save()
+            
+            # Lógica para manejar múltiples archivos si se envían en el POST
+            # Se espera que los archivos vengan en la request.FILES con la clave 'files'
+            files = request.FILES.getlist('files')
+            for f in files:
+                TimelineMedia.objects.create(event=event, file=f)
+                
+            # Devolvemos el evento ya creado con sus medias
+            response_serializer = TimelineEventSerializer(event)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TimelineDetailAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self, request, slug):
+        event = get_object_or_404(TimelineEvent, slug=slug)
+        serializer = TimelineEventSerializer(event)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, slug):
+        event = get_object_or_404(TimelineEvent, slug=slug)
+        serializer = TimelineEventSerializer(event, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            
+            # Podrías agregar lógica acá si querés sumar más fotos al editar
+            files = request.FILES.getlist('files')
+            for f in files:
+                TimelineMedia.objects.create(event=event, file=f)
+                
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, slug):
+        event = get_object_or_404(TimelineEvent, slug=slug)
+        event.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class TimelineMediaDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated] 
+
+    def delete(self, request, pk):
+        media = get_object_or_404(TimelineMedia, pk=pk)
+        media.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,7 +1,6 @@
 from django.urls import include, path
 from .views import *
 
-# Importamos las vistas de passkeys que están en tu app study
 from study.views import (
     PasskeyLoginOptionsAPIView,
     PasskeyLoginVerifyAPIView,
@@ -39,6 +38,11 @@ urlpatterns = [
     path('auth/passkey/login/verify/', PasskeyLoginVerifyAPIView.as_view(), name='passkey_login_verify'),
     path('auth/passkey/register/options/', PasskeyRegisterOptionsAPIView.as_view(), name='passkey_register_options'),
     path('auth/passkey/register/verify/', PasskeyRegisterVerifyAPIView.as_view(), name='passkey_register_verify'),
- 
     path('auth/passkey/list/', PasskeyListView.as_view(), name='passkey_list'),
+
+
+
+    path('timeline/', TimelineListCreateAPIView.as_view(), name='timeline-list-create'),
+    path('timeline/<slug:slug>/', TimelineDetailAPIView.as_view(), name='timeline-detail'),
+    path('timeline/media/<int:pk>/', TimelineMediaDeleteAPIView.as_view(), name='timeline-media-delete'),
 ]
