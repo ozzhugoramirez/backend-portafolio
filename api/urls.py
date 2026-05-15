@@ -14,6 +14,8 @@ from study.views import (
 
 urlpatterns = [
     path('study/', include('study.urls')),
+   
+    path('planner/', include('planner.urls')),
 
     path('token/', CustomLoginAPIView.as_view(), name='token_obtain_pair'),
 
