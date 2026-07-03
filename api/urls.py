@@ -14,6 +14,7 @@ from study.views import (
 
 urlpatterns = [
     path('study/', include('study.urls')),
+    path('bazar/', include('bazar.urls')),
    
     path('planner/', include('planner.urls')),
 

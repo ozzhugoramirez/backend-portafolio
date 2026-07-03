@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'chat',
     'study',
     'planner',
+    'bazar',
 ]
 
 MIDDLEWARE = [
