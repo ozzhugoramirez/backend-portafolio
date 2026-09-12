@@ -1,18 +1,53 @@
-{% extends "base.html" %}
+{% extends "pages/web/base.html" %}
 {% load static %}
 
 {% block navbar %}
-  
 {% endblock navbar %}
 
 {% block content %}
+    <h1>Hola desde mi portafolio en Django</h1>
+    <hr>
 
+    <!-- SECCIÓN PERFIL -->
+    {% if profile %}
+        <h2>{{ profile.name }}</h2>
+        <h3>{{ profile.hero_title }}</h3>
+        <p><strong>Ubicación:</strong> {{ profile.location }}</p>
+        <p>{{ profile.bio_p1 }}</p>
+        
+        <!-- Ejemplo de cómo iterar un JSONField (tu arsenal) -->
+        <h4>Mi Arsenal:</h4>
+        <ul>
+        {% for category in profile.arsenal %}
+            <li><strong>{{ category.category }}:</strong> {{ category.skills|join:", " }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color: red;">No hay datos de perfil. ¡Entrá al /admin/ y creá uno!</p>
+    {% endif %}
 
+    <hr>
 
-<h1>Hola desde mi portafolio</h1>
+    <!-- SECCIÓN PROYECTOS -->
+    <h2>Mis Proyectos Activos</h2>
+    {% if projects %}
+        <ul>
+        {% for project in projects %}
+            <li style="margin-bottom: 20px;">
+                <strong>{{ project.title }}</strong> 
+                <span style="font-size: 0.8em; color: gray;">({{ project.category }})</span>
+                <p>{{ project.short_description }}</p>
+                {% if project.youtube_url %}
+                    <a href="{{ project.youtube_url }}" target="_blank">Ver video</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Todavía no cargaste proyectos en el panel.</p>
+    {% endif %}
 
 {% endblock content %}
 
 {% block footer %}
-  
 {% endblock footer %}
