@@ -1,0 +1,978 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .dashboard-page {
+
+        min-height: 100vh;
+
+        padding: 32px;
+
+        background:
+            radial-gradient(
+                circle at 15% 10%,
+                rgba(120, 119, 198, 0.11),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 90% 80%,
+                rgba(80, 120, 255, 0.08),
+                transparent 30%
+            ),
+            #f5f5f7;
+
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "SF Pro Display",
+            "Segoe UI",
+            sans-serif;
+
+        color: #111;
+    }
+
+
+    .dashboard-container {
+
+        width: 100%;
+        max-width: 1000px;
+
+        margin: 0 auto;
+
+    }
+
+
+    /* HEADER */
+
+    .dashboard-header {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 40px;
+
+    }
+
+
+    .user-area {
+
+        display: flex;
+        align-items: center;
+        gap: 13px;
+
+    }
+
+
+    .user-avatar {
+
+        width: 46px;
+        height: 46px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background: rgba(255,255,255,.75);
+
+        border: 1px solid rgba(255,255,255,.9);
+
+        box-shadow:
+            0 5px 15px rgba(0,0,0,.06);
+
+        font-size: 17px;
+        font-weight: 650;
+
+        text-transform: uppercase;
+
+    }
+
+
+    .user-info {
+
+        display: flex;
+        flex-direction: column;
+
+    }
+
+
+    .user-label {
+
+        color: #999;
+
+        font-size: 11px;
+
+        margin-bottom: 2px;
+
+    }
+
+
+    .username {
+
+        font-size: 15px;
+        font-weight: 600;
+
+    }
+
+
+    /* LOGOUT */
+
+    .logout-button {
+
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        padding: 10px 15px;
+
+        border: 1px solid rgba(0,0,0,.06);
+
+        border-radius: 13px;
+
+        background: rgba(255,255,255,.6);
+
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+
+        color: #555;
+
+        font-size: 13px;
+        font-weight: 500;
+
+        cursor: pointer;
+
+        transition:
+            background .15s ease,
+            color .15s ease,
+            transform .15s ease;
+
+    }
+
+
+    .logout-button:hover {
+
+        background: rgba(255,255,255,.95);
+
+        color: #d70015;
+
+        transform: translateY(-1px);
+
+    }
+
+
+    .logout-button svg {
+
+        width: 16px;
+        height: 16px;
+
+    }
+
+
+    /* INTRO */
+
+    .dashboard-intro {
+
+        margin-bottom: 30px;
+
+    }
+
+
+    .dashboard-title {
+
+        margin: 0;
+
+        font-size: 34px;
+        font-weight: 650;
+
+        letter-spacing: -1.1px;
+
+    }
+
+
+    .dashboard-description {
+
+        margin-top: 8px;
+
+        color: #777;
+
+        font-size: 14px;
+
+    }
+
+
+    /* GLASS CARD */
+
+    .glass-card {
+
+        padding: 28px;
+
+        border-radius: 27px;
+
+        background: rgba(255,255,255,.62);
+
+        border: 1px solid rgba(255,255,255,.8);
+
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+
+        box-shadow:
+            0 15px 50px rgba(0,0,0,.06),
+            inset 0 1px 0 rgba(255,255,255,.9);
+
+    }
+
+
+    .card-header {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+    }
+
+
+    .card-title-area {
+
+        display: flex;
+        align-items: center;
+
+        gap: 15px;
+
+    }
+
+
+    .card-icon {
+
+        width: 45px;
+        height: 45px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 14px;
+
+        background: rgba(255,255,255,.85);
+
+        box-shadow:
+            0 5px 15px rgba(0,0,0,.05);
+
+    }
+
+
+    .card-icon svg {
+
+        width: 21px;
+        height: 21px;
+
+    }
+
+
+    .card-title {
+
+        margin: 0;
+
+        font-size: 17px;
+        font-weight: 620;
+
+    }
+
+
+    .card-subtitle {
+
+        margin: 4px 0 0;
+
+        font-size: 12px;
+
+        color: #888;
+
+    }
+
+
+    /* ADD PASSKEY */
+
+    .add-passkey {
+
+        min-height: 44px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        padding: 0 16px;
+
+        border: none;
+
+        border-radius: 14px;
+
+        background: #111;
+
+        color: white;
+
+        font-size: 13px;
+        font-weight: 550;
+
+        cursor: pointer;
+
+        transition:
+            transform .15s ease,
+            background .15s ease;
+
+    }
+
+
+    .add-passkey:hover {
+
+        background: #000;
+
+        transform: translateY(-1px);
+
+    }
+
+
+    .add-passkey:active {
+
+        transform: scale(.98);
+
+    }
+
+
+    .add-passkey svg {
+
+        width: 16px;
+        height: 16px;
+
+    }
+
+
+    /* STATUS */
+
+    .status {
+
+        min-height: 20px;
+
+        margin-top: 20px;
+        margin-bottom: 0;
+
+        font-size: 13px;
+
+        color: #777;
+
+    }
+
+
+    .status.success {
+
+        color: #248a3d;
+
+    }
+
+
+    .status.error {
+
+        color: #d70015;
+
+    }
+
+
+    /* PASSKEY INFO */
+
+    .passkey-info {
+
+        margin-top: 25px;
+
+        padding-top: 22px;
+
+        border-top:
+            1px solid rgba(0,0,0,.06);
+
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+    }
+
+
+    .security-dot {
+
+        width: 9px;
+        height: 9px;
+
+        border-radius: 50%;
+
+        background: #30d158;
+
+        box-shadow:
+            0 0 0 4px rgba(48,209,88,.10);
+
+        flex-shrink: 0;
+
+    }
+
+
+    .security-text {
+
+        font-size: 12px;
+
+        color: #888;
+
+    }
+
+
+    @media(max-width: 650px) {
+
+        .dashboard-page {
+
+            padding: 22px 17px;
+
+        }
+
+
+        .dashboard-header {
+
+            margin-bottom: 32px;
+
+        }
+
+
+        .dashboard-title {
+
+            font-size: 29px;
+
+        }
+
+
+        .glass-card {
+
+            padding: 22px;
+
+        }
+
+
+        .card-header {
+
+            flex-direction: column;
+            align-items: stretch;
+
+        }
+
+
+        .add-passkey {
+
+            width: 100%;
+
+        }
+
+
+        .logout-button span {
+
+            display: none;
+
+        }
+
+    }
+
+</style>
+
+
+<div class="dashboard-page">
+
+    <div class="dashboard-container">
+
+
+        <!-- HEADER -->
+
+        <header class="dashboard-header">
+
+            <div class="user-area">
+
+                <div class="user-avatar">
+                    {{ request.user.username|slice:":1" }}
+                </div>
+
+                <div class="user-info">
+
+                    <span class="user-label">
+                        Sesión activa
+                    </span>
+
+                    <span class="username">
+                        {{ request.user.username }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGOUT -->
+
+            <form
+                method="POST"
+                action="{% url 'logout' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="logout-button"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+
+                        <path
+                            d="M10 17l5-5-5-5"
+                        ></path>
+
+                        <path
+                            d="M15 12H3"
+                        ></path>
+
+                        <path
+                            d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"
+                        ></path>
+
+                    </svg>
+
+                    <span>
+                        Cerrar sesión
+                    </span>
+
+                </button>
+
+            </form>
+
+        </header>
+
+
+
+        <!-- INTRO -->
+
+        <section class="dashboard-intro">
+
+            <h1 class="dashboard-title">
+                Dashboard
+            </h1>
+
+            <p class="dashboard-description">
+                Administrá el acceso seguro a tu cuenta.
+            </p>
+
+        </section>
+
+
+
+        <!-- PASSKEY CARD -->
+
+        <section class="glass-card">
+
+
+            <div class="card-header">
+
+
+                <div class="card-title-area">
+
+                    <div class="card-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+
+                            <circle
+                                cx="7.5"
+                                cy="12"
+                                r="3.5"
+                            ></circle>
+
+                            <path d="M11 12h9"></path>
+
+                            <path d="M17 12v3"></path>
+
+                            <path d="M20 12v2"></path>
+
+                        </svg>
+
+                    </div>
+
+
+                    <div>
+
+                        <h2 class="card-title">
+                            Llaves de acceso
+                        </h2>
+
+                        <p class="card-subtitle">
+                            Touch ID, Face ID y Passkeys
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <button
+                    id="btn-register-passkey"
+                    class="add-passkey"
+                    type="button"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+
+                        <path d="M12 5v14"></path>
+                        <path d="M5 12h14"></path>
+
+                    </svg>
+
+                    Agregar dispositivo
+
+                </button>
+
+            </div>
+
+
+            <p
+                id="reg-status-msg"
+                class="status"
+            ></p>
+
+
+            <div class="passkey-info">
+
+                <span class="security-dot"></span>
+
+                <span class="security-text">
+                    Tu cuenta está protegida mediante WebAuthn.
+                </span>
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</div>
+
+
+
+<script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+
+
+<script>
+
+    const btnRegister =
+        document.getElementById(
+            "btn-register-passkey"
+        );
+
+    const statusMsg =
+        document.getElementById(
+            "reg-status-msg"
+        );
+
+
+    function getCookie(name) {
+
+        let cookieValue = null;
+
+        if (
+            document.cookie &&
+            document.cookie !== ""
+        ) {
+
+            const cookies =
+                document.cookie.split(";");
+
+
+            for (let cookie of cookies) {
+
+                cookie = cookie.trim();
+
+
+                if (
+                    cookie.substring(
+                        0,
+                        name.length + 1
+                    ) ===
+                    (name + "=")
+                ) {
+
+                    cookieValue =
+                        decodeURIComponent(
+                            cookie.substring(
+                                name.length + 1
+                            )
+                        );
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+
+        return cookieValue;
+
+    }
+
+
+
+    btnRegister.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                const deviceName = prompt(
+
+                    "Nombre para este dispositivo:",
+
+                    "MacBook"
+
+                );
+
+
+                if (!deviceName) {
+                    return;
+                }
+
+
+                statusMsg.className =
+                    "status";
+
+                statusMsg.textContent =
+                    "Preparando nueva Passkey...";
+
+
+                btnRegister.disabled = true;
+
+
+
+                /*
+                 * OPCIONES
+                 */
+
+                const optionsRes =
+                    await fetch(
+
+                        "/api/auth/passkey/register/options/",
+
+                        {
+
+                            method: "GET",
+
+                            credentials:
+                                "same-origin"
+
+                        }
+
+                    );
+
+
+                const optionsData =
+                    await optionsRes.json();
+
+
+
+                if (!optionsRes.ok) {
+
+                    throw new Error(
+
+                        optionsData.detail ||
+
+                        "No se pudieron obtener las opciones"
+
+                    );
+
+                }
+
+
+
+                const {
+
+                    challenge_id,
+
+                    ...optionsJSON
+
+                } = optionsData;
+
+
+
+                statusMsg.textContent =
+                    "Confirmá con Touch ID, Face ID o tu dispositivo";
+
+
+
+                /*
+                 * REGISTRO WEBAUTHN
+                 */
+
+                const attestation =
+                    await SimpleWebAuthnBrowser.startRegistration({
+
+                        optionsJSON:
+                            optionsJSON
+
+                    });
+
+
+
+                statusMsg.textContent =
+                    "Guardando Passkey...";
+
+
+
+                /*
+                 * VERIFICAR
+                 */
+
+                const verifyRes =
+                    await fetch(
+
+                        "/api/auth/passkey/register/verify/",
+
+                        {
+
+                            method:
+                                "POST",
+
+                            credentials:
+                                "same-origin",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "X-CSRFToken":
+                                    getCookie(
+                                        "csrftoken"
+                                    )
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    attestation:
+                                        attestation,
+
+                                    challenge_id:
+                                        challenge_id,
+
+                                    name:
+                                        deviceName
+
+                                })
+
+                        }
+
+                    );
+
+
+
+                const verifyData =
+                    await verifyRes.json();
+
+
+
+                if (!verifyRes.ok) {
+
+                    throw new Error(
+
+                        verifyData.detail ||
+
+                        "No se pudo guardar la Passkey"
+
+                    );
+
+                }
+
+
+
+                statusMsg.className =
+                    "status success";
+
+
+                statusMsg.textContent =
+                    "✓ Nuevo dispositivo registrado correctamente";
+
+
+            } catch (error) {
+
+
+                console.error(
+                    "PASSKEY REGISTER ERROR:",
+                    error
+                );
+
+
+                statusMsg.className =
+                    "status error";
+
+
+                if (
+                    error.name ===
+                    "NotAllowedError"
+                ) {
+
+                    statusMsg.textContent =
+                        "Registro cancelado";
+
+                } else {
+
+                    statusMsg.textContent =
+                        error.message;
+
+                }
+
+
+            } finally {
+
+                btnRegister.disabled =
+                    false;
+
+            }
+
+        }
+    );
+
+</script>
+
+{% endblock %}

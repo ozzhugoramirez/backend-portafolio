@@ -1,0 +1,576 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .passkey-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+
+        background:
+            radial-gradient(circle at 20% 20%,
+                rgba(120, 119, 198, 0.12),
+                transparent 35%),
+            radial-gradient(circle at 80% 80%,
+                rgba(80, 120, 255, 0.10),
+                transparent 35%),
+            #f5f5f7;
+
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "SF Pro Display",
+            "Segoe UI",
+            sans-serif;
+    }
+
+    .passkey-card {
+        width: 100%;
+        max-width: 410px;
+
+        padding: 42px 36px 34px;
+
+        border-radius: 30px;
+
+        background: rgba(255, 255, 255, 0.65);
+
+        border: 1px solid rgba(255, 255, 255, 0.8);
+
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+
+        box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+        text-align: center;
+    }
+
+    .app-icon {
+        width: 68px;
+        height: 68px;
+
+        margin: 0 auto 26px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 21px;
+
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, 0.95),
+                rgba(235, 235, 240, 0.75));
+
+        box-shadow:
+            0 8px 24px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 white;
+    }
+
+    .app-icon svg {
+        width: 32px;
+        height: 32px;
+        stroke: #111;
+    }
+
+    .passkey-title {
+        margin: 0;
+
+        color: #111;
+
+        font-size: 29px;
+        font-weight: 650;
+
+        letter-spacing: -0.9px;
+    }
+
+    .passkey-description {
+        margin: 10px auto 30px;
+
+        max-width: 300px;
+
+        color: #777;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .passkey-button {
+        width: 100%;
+        min-height: 54px;
+
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        padding: 0 20px;
+
+        border: none;
+        border-radius: 17px;
+
+        background: #111;
+
+        color: white;
+        font-size: 15px;
+        font-weight: 560;
+
+        cursor: pointer;
+
+        transition:
+            transform 0.15s ease,
+            opacity 0.15s ease,
+            background 0.15s ease;
+    }
+
+    .passkey-button:hover {
+        background: #000;
+        transform: translateY(-1px);
+    }
+
+    .passkey-button:active {
+        transform: scale(0.985);
+    }
+
+    .passkey-button:disabled {
+        cursor: default;
+        opacity: 0.65;
+        transform: none;
+    }
+
+    .passkey-button svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+    }
+
+    .status {
+        min-height: 21px;
+
+        margin-top: 19px;
+        margin-bottom: 0;
+
+        color: #777;
+
+        font-size: 13px;
+
+        transition: color 0.2s ease;
+    }
+
+    .status.success {
+        color: #248a3d;
+    }
+
+    .status.error {
+        color: #d70015;
+    }
+
+    .security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+
+        margin-top: 25px;
+
+        color: #999;
+        font-size: 11px;
+    }
+
+    .security-note svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .spinner {
+        width: 17px;
+        height: 17px;
+
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-top-color: white;
+        border-radius: 50%;
+
+        animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (max-width: 500px) {
+        .passkey-page {
+            padding: 18px;
+        }
+
+        .passkey-card {
+            padding: 36px 25px 30px;
+            border-radius: 26px;
+        }
+    }
+</style>
+
+
+<div class="passkey-page">
+
+    <div class="passkey-card">
+
+        <!-- Ícono -->
+        <div class="app-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+
+                <path d="M5.5 8.5A7 7 0 0 1 18.5 8.5"></path>
+                <path d="M4 12a8 8 0 0 0 3 6.2"></path>
+                <path d="M20 12a8 8 0 0 1-3 6.2"></path>
+
+                <path d="M9.5 20.5a9 9 0 0 0 5 0"></path>
+            </svg>
+        </div>
+
+
+        <h1 class="passkey-title">
+            Bienvenido
+        </h1>
+
+        <p class="passkey-description">
+            Verificá tu identidad para acceder al panel privado.
+        </p>
+
+
+        <button id="btn-login-passkey" class="passkey-button" type="button">
+
+            <svg id="passkey-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="7.5" cy="12" r="3.5"></circle>
+                <path d="M11 12h9"></path>
+                <path d="M17 12v3"></path>
+                <path d="M20 12v2"></path>
+            </svg>
+
+            <span id="login-button-text">
+                Ingresar con Passkey
+            </span>
+
+        </button>
+
+
+        <p id="status-msg" class="status"></p>
+
+
+        <div class="security-note">
+
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+            </svg>
+
+            Autenticación protegida mediante WebAuthn
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
+
+
+<script>
+
+    const btnLogin =
+        document.getElementById("btn-login-passkey");
+
+    const statusMsg =
+        document.getElementById("status-msg");
+
+    const buttonText =
+        document.getElementById("login-button-text");
+
+    const passkeyIcon =
+        document.getElementById("passkey-icon");
+
+
+    /*
+     * Guardaremos temporalmente las opciones
+     * para que el login responda más rápido.
+     */
+    let cachedOptions = null;
+    let cachedAt = 0;
+
+
+    async function loadPasskeyOptions(force = false) {
+
+        const now = Date.now();
+
+        /*
+         * Renovamos las opciones después de
+         * aproximadamente 4 minutos.
+         */
+        if (
+            cachedOptions &&
+            !force &&
+            (now - cachedAt) < 240000
+        ) {
+            return cachedOptions;
+        }
+
+
+        const response = await fetch(
+            "/api/auth/passkey/login/options/",
+            {
+                method: "GET",
+                credentials: "same-origin"
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail ||
+                "No se pudo preparar el acceso"
+            );
+        }
+
+
+        cachedOptions = data;
+        cachedAt = Date.now();
+
+        return data;
+    }
+
+
+    /*
+     * Precarga silenciosa.
+     *
+     * Cuando el usuario presione el botón,
+     * probablemente ya tendremos el challenge.
+     */
+    window.addEventListener(
+        "DOMContentLoaded",
+        () => {
+
+            loadPasskeyOptions().catch(error => {
+                console.warn(
+                    "No se pudieron precargar las opciones:",
+                    error
+                );
+            });
+
+        }
+    );
+
+
+    btnLogin.addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                statusMsg.className = "status";
+
+                statusMsg.textContent =
+                    "Preparando acceso...";
+
+
+                btnLogin.disabled = true;
+
+                passkeyIcon.style.display = "none";
+
+
+                const spinner =
+                    document.createElement("span");
+
+                spinner.className = "spinner";
+
+                spinner.id = "login-spinner";
+
+
+                btnLogin.insertBefore(
+                    spinner,
+                    buttonText
+                );
+
+
+                buttonText.textContent =
+                    "Verificando";
+
+
+                /*
+                 * 1. Obtener challenge
+                 */
+                const optionsData =
+                    await loadPasskeyOptions();
+
+
+                /*
+                 * challenge_id es nuestro,
+                 * no pertenece al estándar WebAuthn.
+                 */
+                const {
+                    challenge_id,
+                    ...optionsJSON
+                } = optionsData;
+
+
+                statusMsg.textContent =
+                    "Confirmá con Touch ID, Face ID o tu dispositivo";
+
+
+                /*
+                 * 2. WebAuthn
+                 */
+                const assertion =
+                    await SimpleWebAuthnBrowser.startAuthentication({
+                        optionsJSON: optionsJSON
+                    });
+
+
+                statusMsg.textContent =
+                    "Validando identidad...";
+
+
+                /*
+                 * 3. Verificar con Django
+                 */
+                const verifyRes = await fetch(
+                    "/api/auth/passkey/login/verify/",
+                    {
+
+                        method: "POST",
+
+                        credentials: "same-origin",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            assertion: assertion,
+
+                            challenge_id:
+                                challenge_id
+
+                        })
+
+                    }
+                );
+
+
+                const verifyData =
+                    await verifyRes.json();
+
+
+                if (!verifyRes.ok) {
+
+                    throw new Error(
+                        verifyData.detail ||
+                        "No se pudo verificar la Passkey"
+                    );
+
+                }
+
+
+                statusMsg.className =
+                    "status success";
+
+                statusMsg.textContent =
+                    "Acceso autorizado";
+
+
+                buttonText.textContent =
+                    "Acceso autorizado";
+
+
+                /*
+                 * Pequeñísima pausa visual antes
+                 * de cambiar de página.
+                 */
+                setTimeout(() => {
+
+                    window.location.href =
+                        verifyData.redirect_url;
+
+                }, 250);
+
+
+            } catch (error) {
+
+                console.error(
+                    "PASSKEY LOGIN ERROR:",
+                    error
+                );
+
+
+                cachedOptions = null;
+
+
+                statusMsg.className =
+                    "status error";
+
+
+                /*
+                 * Si el usuario simplemente cerró
+                 * Touch ID / Face ID, mostramos
+                 * algo más amigable.
+                 */
+                if (
+                    error.name === "NotAllowedError"
+                ) {
+
+                    statusMsg.textContent =
+                        "Autenticación cancelada";
+
+                } else {
+
+                    statusMsg.textContent =
+                        error.message;
+
+                }
+
+
+                btnLogin.disabled = false;
+
+
+                const spinner =
+                    document.getElementById(
+                        "login-spinner"
+                    );
+
+
+                if (spinner) {
+                    spinner.remove();
+                }
+
+
+                passkeyIcon.style.display = "";
+
+
+                buttonText.textContent =
+                    "Ingresar con Passkey";
+
+            }
+
+        }
+    );
+
+</script>
+
+{% endblock %}

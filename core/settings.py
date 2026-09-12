@@ -146,20 +146,19 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DESTINATION_EMAIL = config('DESTINATION_EMAIL', default=EMAIL_HOST_USER)
 
 
+WEBAUTHN_RP_NAME = "Sebastian Villalba - Admin"
 
-"""
-WEBAUTHN_RP_ID = 'localhost' 
-WEBAUTHN_RP_NAME = 'Admin DevSebastian'
-WEBAUTHN_EXPECTED_ORIGIN = 'http://localhost:3000'
-"""
+if DEBUG:
+    WEBAUTHN_RP_ID = "localhost"
+    WEBAUTHN_EXPECTED_ORIGIN = "http://localhost:8000"
 
-WEBAUTHN_RP_ID = 'devsebastian.com' 
-WEBAUTHN_RP_NAME = 'Sebastian Villalba - Admin'
+else:
+    WEBAUTHN_RP_ID = "devsebastian.com"
 
-WEBAUTHN_EXPECTED_ORIGIN = [
-    'https://devsebastian.com',
-    'https://www.devsebastian.com'
-]
+    WEBAUTHN_EXPECTED_ORIGIN = [
+        "https://devsebastian.com",
+        "https://www.devsebastian.com",
+    ]
 
 CACHES = {
     'default': {
