@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -5,49 +6,3185 @@
 {% endblock navbar %}
 
 {% block content %}
-    <h1>PORTAFOLIO EN MANTENIMIENTO</h1>
-    <hr>
 
-    <!-- SECCIÓN PERFIL -->
-    {% if profile %}
-        <h2>{{ profile.name }}</h2>
-        <h3>{{ profile.hero_title }}</h3>
-        <p><strong>Ubicación:</strong> {{ profile.location }}</p>
-        <p>{{ profile.bio_p1 }}</p>
-        
-        <!-- Ejemplo de cómo iterar un JSONField (tu arsenal) -->
-        <h4>Mi Arsenal:</h4>
-        <ul>
-        {% for category in profile.arsenal %}
-            <li><strong>{{ category.category }}:</strong> {{ category.skills|join:", " }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p style="color: red;">No hay datos de perfil. ¡Entrá al /admin/ y creá uno!</p>
-    {% endif %}
+<style>
 
-    <hr>
+    /* ==========================================================
+       VARIABLES
+    ========================================================== */
 
-    <!-- SECCIÓN PROYECTOS -->
-    <h2>Mis Proyectos Activos</h2>
-    {% if projects %}
-        <ul>
-        {% for project in projects %}
-            <li style="margin-bottom: 20px;">
-                <strong>{{ project.title }}</strong> 
-                <span style="font-size: 0.8em; color: gray;">({{ project.category }})</span>
-                <p>{{ project.short_description }}</p>
-                {% if project.youtube_url %}
-                    <a href="{{ project.youtube_url }}" target="_blank">Ver video</a>
+    :root {
+        --bg: #ffffff;
+        --sidebar-bg: #f5f5f7;
+
+        --surface: #ffffff;
+        --surface-soft: #f5f5f7;
+        --surface-hover: #eeeeF0;
+
+        --text: #1d1d1f;
+        --text-secondary: #6e6e73;
+        --text-soft: #86868b;
+
+        --border: rgba(0, 0, 0, 0.08);
+        --border-strong: rgba(0, 0, 0, 0.13);
+
+        --blue: #0071e3;
+        --green: #30d158;
+
+        --radius-sm: 14px;
+        --radius-md: 22px;
+        --radius-lg: 30px;
+
+        --shadow-soft:
+            0 18px 50px rgba(0, 0, 0, 0.06);
+
+        --shadow-hover:
+            0 28px 70px rgba(0, 0, 0, 0.10);
+    }
+
+
+    /* ==========================================================
+       RESET
+    ========================================================== */
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+
+        background: var(--bg);
+        color: var(--text);
+
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "SF Pro Display",
+            "SF Pro Text",
+            "Helvetica Neue",
+            Helvetica,
+            Arial,
+            sans-serif;
+
+        -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    button {
+        font: inherit;
+    }
+
+    img,
+    video {
+        display: block;
+    }
+
+
+    /* ==========================================================
+       LAYOUT
+    ========================================================== */
+
+    .portfolio-layout {
+        min-height: 100vh;
+
+        display: flex;
+        flex-direction: column;
+
+        background: var(--bg);
+    }
+
+
+    /* ==========================================================
+       SIDEBAR IZQUIERDO
+    ========================================================== */
+
+    .sidebar {
+        position: relative;
+
+        padding: 60px 24px;
+
+        background:
+            radial-gradient(
+                circle at 10% 0%,
+                rgba(255, 255, 255, .95),
+                transparent 35%
+            ),
+            var(--sidebar-bg);
+
+        border-bottom: 1px solid var(--border);
+
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar-inner {
+        width: 100%;
+        max-width: 430px;
+
+        margin: auto;
+    }
+
+
+    /* ==========================================================
+       AVATAR
+    ========================================================== */
+
+    .profile-top {
+        display: flex;
+        align-items: center;
+
+        gap: 16px;
+
+        margin-bottom: 32px;
+    }
+
+    .avatar-wrap {
+        position: relative;
+
+        width: 80px;
+        height: 80px;
+
+        flex-shrink: 0;
+    }
+
+    .profile-photo {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        border-radius: 24px;
+
+        background: #ececef;
+
+        box-shadow:
+            0 14px 35px rgba(0, 0, 0, .10);
+
+        transition:
+            transform .45s cubic-bezier(.16, 1, .3, 1),
+            box-shadow .45s ease;
+    }
+
+    .avatar-wrap:hover .profile-photo {
+        transform:
+            translateY(-4px)
+            rotate(-2deg)
+            scale(1.025);
+
+        box-shadow:
+            0 22px 45px rgba(0, 0, 0, .14);
+    }
+
+    .availability-dot {
+        position: absolute;
+
+        right: -3px;
+        bottom: -3px;
+
+        width: 20px;
+        height: 20px;
+
+        border-radius: 50%;
+
+        border: 4px solid var(--sidebar-bg);
+
+        background: var(--green);
+    }
+
+    .profile-meta strong {
+        display: block;
+
+        margin-bottom: 5px;
+
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .profile-meta span {
+        font-size: 13px;
+
+        color: var(--text-soft);
+    }
+
+
+    /* ==========================================================
+       TEXTO PERFIL
+    ========================================================== */
+
+    .eyebrow {
+        margin-bottom: 13px;
+
+        color: var(--text-soft);
+
+        font-size: 11px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+
+        letter-spacing: .1em;
+    }
+
+    .name-title {
+        margin: 0;
+
+        font-size: clamp(44px, 4.2vw, 66px);
+
+        line-height: .95;
+
+        letter-spacing: -.055em;
+
+        font-weight: 650;
+    }
+
+    .job-title {
+        margin: 12px 0 0;
+
+        color: #929298;
+
+        font-size: clamp(25px, 2.4vw, 35px);
+
+        line-height: 1.05;
+
+        letter-spacing: -.04em;
+
+        font-weight: 550;
+    }
+
+    .location {
+        margin-top: 23px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 7px;
+
+        font-size: 13px;
+
+        color: var(--text-soft);
+    }
+
+    .bio {
+        max-width: 390px;
+
+        margin: 24px 0 0;
+
+        font-size: 15px;
+
+        line-height: 1.65;
+
+        color: var(--text-secondary);
+    }
+
+
+    /* ==========================================================
+       BOTONES
+    ========================================================== */
+
+    .profile-actions {
+        margin-top: 30px;
+
+        display: flex;
+
+        gap: 8px;
+
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        min-height: 43px;
+
+        padding: 0 17px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+
+        border: none;
+
+        border-radius: 999px;
+
+        cursor: pointer;
+
+        font-size: 13px;
+        font-weight: 550;
+
+        transition:
+            transform .25s cubic-bezier(.16,1,.3,1),
+            background .2s ease,
+            box-shadow .25s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-primary {
+        background: var(--text);
+
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #343437;
+
+        box-shadow:
+            0 10px 25px rgba(0,0,0,.12);
+    }
+
+    .btn-secondary {
+        background: rgba(0,0,0,.055);
+
+        color: var(--text);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(0,0,0,.09);
+    }
+
+
+    /* ==========================================================
+       REDES
+    ========================================================== */
+
+    .social-area {
+        margin-top: 29px;
+
+        padding-top: 21px;
+
+        border-top: 1px solid var(--border);
+    }
+
+    .social-label {
+        margin-bottom: 12px;
+
+        font-size: 10px;
+        font-weight: 600;
+
+        letter-spacing: .09em;
+
+        text-transform: uppercase;
+
+        color: var(--text-soft);
+    }
+
+    .social-row {
+        display: flex;
+
+        gap: 8px;
+    }
+
+    .social-link {
+        width: 41px;
+        height: 41px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: rgba(0,0,0,.045);
+
+        color: var(--text-secondary);
+
+        transition:
+            transform .25s ease,
+            background .2s ease,
+            color .2s ease;
+    }
+
+    .social-link svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .social-link:hover {
+        transform: translateY(-3px);
+
+        background: rgba(0,0,0,.09);
+
+        color: var(--text);
+    }
+
+
+    /* ==========================================================
+       FOOT SIDEBAR
+    ========================================================== */
+
+    .sidebar-footer {
+        margin-top: 35px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        color: var(--text-soft);
+
+        font-size: 11px;
+    }
+
+    .available {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+    }
+
+    .available::before {
+        content: "";
+
+        width: 7px;
+        height: 7px;
+
+        border-radius: 50%;
+
+        background: var(--green);
+
+        box-shadow:
+            0 0 0 4px rgba(48, 209, 88, .10);
+    }
+
+
+    /* ==========================================================
+       PANEL DERECHO
+    ========================================================== */
+
+    .main-content {
+        position: relative;
+
+        flex: 1;
+
+        padding: 0 20px 60px;
+
+        background: white;
+    }
+
+    .main-inner {
+        width: 100%;
+        max-width: 950px;
+
+        margin: 0 auto;
+    }
+
+
+    /* ==========================================================
+       NAVBAR DERECHO
+    ========================================================== */
+
+    .right-navbar-shell {
+        position: sticky;
+
+        top: 0;
+
+        z-index: 100;
+
+        margin-bottom: 25px;
+
+        padding: 18px 0 13px;
+
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(255,255,255,.98) 65%,
+                rgba(255,255,255,.82) 85%,
+                rgba(255,255,255,0)
+            );
+
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .right-navbar {
+        width: fit-content;
+
+        margin-left: auto;
+
+        padding: 5px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 3px;
+
+        border: 1px solid var(--border);
+
+        border-radius: 999px;
+
+        background: rgba(245,245,247,.82);
+
+        box-shadow:
+            0 8px 24px rgba(0,0,0,.05);
+
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .right-navbar a {
+        padding: 9px 15px;
+
+        border-radius: 999px;
+
+        color: var(--text-secondary);
+
+        font-size: 12px;
+        font-weight: 550;
+
+        transition:
+            color .2s ease,
+            background .2s ease,
+            transform .2s ease;
+    }
+
+    .right-navbar a:hover {
+        color: var(--text);
+
+        background: white;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* ==========================================================
+       VIDEO
+    ========================================================== */
+
+    .video-card {
+        position: relative;
+
+        width: 100%;
+
+        overflow: hidden;
+
+        border-radius: var(--radius-lg);
+
+        background: #0d0d0e;
+
+        box-shadow:
+            0 28px 80px rgba(0,0,0,.14);
+
+        transform: translateZ(0);
+    }
+
+    .presentation-video {
+        width: 100%;
+
+        aspect-ratio: 16 / 9;
+
+        object-fit: cover;
+
+        background: #111;
+
+        transition:
+            transform 1.2s cubic-bezier(.16,1,.3,1);
+    }
+
+    .video-card:hover .presentation-video {
+        transform: scale(1.018);
+    }
+
+    .video-overlay {
+        position: absolute;
+
+        inset: 0;
+
+        padding: 25px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        pointer-events: none;
+
+        background:
+            linear-gradient(
+                to bottom,
+                rgba(0,0,0,.36),
+                transparent 34%,
+                transparent 55%,
+                rgba(0,0,0,.55)
+            );
+    }
+
+    .video-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .video-badge {
+        padding: 8px 12px;
+
+        border: 1px solid rgba(255,255,255,.16);
+
+        border-radius: 999px;
+
+        background: rgba(255,255,255,.13);
+
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+
+        color: white;
+
+        font-size: 11px;
+    }
+
+    .video-controls {
+        display: flex;
+        align-items: center;
+
+        gap: 7px;
+
+        pointer-events: auto;
+    }
+
+    .video-control {
+        width: 40px;
+        height: 40px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0;
+
+        border: 1px solid rgba(255,255,255,.16);
+
+        border-radius: 50%;
+
+        background: rgba(255,255,255,.13);
+
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+
+        color: white;
+
+        cursor: pointer;
+
+        transition:
+            transform .2s ease,
+            background .2s ease;
+    }
+
+    .video-control:hover {
+        transform: scale(1.06);
+
+        background: rgba(255,255,255,.24);
+    }
+
+    .video-control svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .video-bottom h2 {
+        margin: 0 0 7px;
+
+        color: white;
+
+        font-size: clamp(28px, 4vw, 47px);
+
+        line-height: 1;
+
+        letter-spacing: -.045em;
+    }
+
+    .video-bottom p {
+        max-width: 570px;
+
+        margin: 0;
+
+        color: rgba(255,255,255,.76);
+
+        font-size: 13px;
+
+        line-height: 1.55;
+    }
+
+
+    /* ==========================================================
+       INTRO
+    ========================================================== */
+
+    .intro {
+        padding: 78px 0 64px;
+    }
+
+    .section-kicker {
+        display: block;
+
+        margin-bottom: 13px;
+
+        color: var(--text-soft);
+
+        font-size: 10px;
+        font-weight: 650;
+
+        text-transform: uppercase;
+
+        letter-spacing: .11em;
+    }
+
+    .intro h2 {
+        max-width: 760px;
+
+        margin: 0;
+
+        font-size: clamp(40px, 5.4vw, 68px);
+
+        line-height: .98;
+
+        letter-spacing: -.055em;
+
+        font-weight: 620;
+    }
+
+    .intro h2 span {
+        color: #a1a1a6;
+    }
+
+    .intro-description {
+        max-width: 640px;
+
+        margin: 27px 0 0;
+
+        font-size: 17px;
+
+        line-height: 1.65;
+
+        color: var(--text-secondary);
+    }
+
+
+    /* ==========================================================
+       SECCIONES
+    ========================================================== */
+
+    .content-section {
+        padding: 65px 0;
+
+        border-top: 1px solid var(--border);
+    }
+
+    .section-heading {
+        margin-bottom: 34px;
+
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+
+        gap: 30px;
+    }
+
+    .section-heading h3 {
+        margin: 0;
+
+        font-size: clamp(30px, 4vw, 44px);
+
+        letter-spacing: -.04em;
+    }
+
+    .section-heading p {
+        max-width: 400px;
+
+        margin: 0;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+
+        color: var(--text-secondary);
+    }
+
+
+    /* ==========================================================
+       STACK
+    ========================================================== */
+
+    .stack-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr));
+
+        gap: 12px;
+    }
+
+    .stack-card {
+        padding: 24px;
+
+        border: none;
+
+        border-radius: var(--radius-md);
+
+        background: var(--surface-soft);
+
+        cursor: pointer;
+
+        text-align: left;
+
+        color: inherit;
+
+        transition:
+            transform .35s cubic-bezier(.16,1,.3,1),
+            box-shadow .35s ease,
+            background .25s ease;
+    }
+
+    .stack-card:hover {
+        transform: translateY(-4px);
+
+        background: #efeff1;
+    }
+
+    .stack-card.open {
+        background: white;
+
+        box-shadow: var(--shadow-soft);
+    }
+
+    .stack-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+    }
+
+    .stack-number {
+        margin-bottom: 30px;
+
+        color: #b2b2b7;
+
+        font-size: 11px;
+    }
+
+    .stack-card strong {
+        display: block;
+
+        font-size: 15px;
+    }
+
+    .expand-icon {
+        width: 31px;
+        height: 31px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        background: white;
+
+        font-size: 17px;
+
+        transition:
+            transform .35s cubic-bezier(.16,1,.3,1);
+    }
+
+    .stack-card.open .expand-icon {
+        transform: rotate(45deg);
+    }
+
+    .stack-details {
+        display: grid;
+
+        grid-template-rows: 0fr;
+
+        transition:
+            grid-template-rows .4s cubic-bezier(.16,1,.3,1),
+            margin .4s ease;
+    }
+
+    .stack-card.open .stack-details {
+        grid-template-rows: 1fr;
+
+        margin-top: 21px;
+    }
+
+    .stack-details-inner {
+        overflow: hidden;
+    }
+
+    .stack-list {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 7px;
+
+        padding-top: 1px;
+    }
+
+    .stack-pill {
+        padding: 7px 10px;
+
+        border-radius: 9px;
+
+        background: var(--surface-soft);
+
+        color: var(--text-secondary);
+
+        font-size: 11px;
+    }
+
+    .stack-hint {
+        margin-top: 15px;
+
+        color: var(--text-soft);
+
+        font-size: 11px;
+
+        line-height: 1.5;
+    }
+
+
+    /* ==========================================================
+       PROYECTOS
+    ========================================================== */
+
+    .project-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .project-card {
+        position: relative;
+
+        padding: 30px;
+
+        overflow: hidden;
+
+        border-radius: var(--radius-md);
+
+        background: var(--surface-soft);
+
+        cursor: pointer;
+
+        transition:
+            transform .4s cubic-bezier(.16,1,.3,1),
+            background .3s ease,
+            box-shadow .4s ease;
+    }
+
+    .project-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .project-card.open {
+        background: white;
+
+        box-shadow: var(--shadow-hover);
+    }
+
+    .project-glow {
+        position: absolute;
+
+        top: -170px;
+        right: -140px;
+
+        width: 350px;
+        height: 350px;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(0,113,227,.11),
+                transparent 67%
+            );
+
+        transition:
+            transform .8s cubic-bezier(.16,1,.3,1);
+    }
+
+    .project-card:hover .project-glow,
+    .project-card.open .project-glow {
+        transform: scale(1.4);
+    }
+
+    .project-content {
+        position: relative;
+
+        z-index: 2;
+    }
+
+    .project-meta {
+        margin-bottom: 24px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 9px;
+    }
+
+    .project-number {
+        color: #aaaab0;
+
+        font-size: 11px;
+    }
+
+    .project-category {
+        padding: 6px 9px;
+
+        border-radius: 999px;
+
+        background: white;
+
+        color: var(--text-secondary);
+
+        font-size: 10px;
+        font-weight: 600;
+
+        text-transform: uppercase;
+
+        letter-spacing: .07em;
+    }
+
+    .project-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+
+        gap: 20px;
+    }
+
+    .project-card h4 {
+        max-width: 600px;
+
+        margin: 0 0 13px;
+
+        font-size: clamp(29px, 4vw, 43px);
+
+        line-height: 1;
+
+        letter-spacing: -.045em;
+    }
+
+    .project-description {
+        max-width: 620px;
+
+        margin: 0;
+
+        color: var(--text-secondary);
+
+        font-size: 14px;
+
+        line-height: 1.6;
+    }
+
+    .project-expand {
+        width: 35px;
+        height: 35px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: white;
+
+        font-size: 19px;
+
+        transition:
+            transform .35s cubic-bezier(.16,1,.3,1);
+    }
+
+    .project-card.open .project-expand {
+        transform: rotate(45deg);
+    }
+
+
+    /* ==========================================================
+       DETALLE PROYECTOS
+    ========================================================== */
+
+    .project-details {
+        display: grid;
+
+        grid-template-rows: 0fr;
+
+        transition:
+            grid-template-rows .45s cubic-bezier(.16,1,.3,1),
+            margin .45s ease;
+    }
+
+    .project-card.open .project-details {
+        grid-template-rows: 1fr;
+
+        margin-top: 35px;
+    }
+
+    .project-details-inner {
+        overflow: hidden;
+    }
+
+    .project-detail-grid {
+        padding-top: 28px;
+
+        border-top: 1px solid var(--border);
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, minmax(0,1fr));
+
+        gap: 15px;
+    }
+
+    .detail-item span {
+        display: block;
+
+        margin-bottom: 7px;
+
+        font-size: 9px;
+        font-weight: 650;
+
+        text-transform: uppercase;
+
+        letter-spacing: .09em;
+
+        color: var(--text-soft);
+    }
+
+    .detail-item strong {
+        font-size: 13px;
+
+        font-weight: 550;
+    }
+
+    .project-footer {
+        margin-top: 30px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+    }
+
+    .project-status {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+
+        color: var(--text-soft);
+
+        font-size: 11px;
+    }
+
+    .project-status::before {
+        content: "";
+
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: var(--green);
+    }
+
+    .project-link {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 8px;
+
+        font-size: 12px;
+        font-weight: 550;
+    }
+
+    .project-link-circle {
+        width: 31px;
+        height: 31px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--surface-soft);
+    }
+
+
+    /* ==========================================================
+       CONTACTO
+    ========================================================== */
+
+    .contact-card {
+        position: relative;
+
+        overflow: hidden;
+
+        padding: 45px;
+
+        border-radius: var(--radius-lg);
+
+        background: #1d1d1f;
+
+        color: white;
+    }
+
+    .contact-card::after {
+        content: "";
+
+        position: absolute;
+
+        width: 400px;
+        height: 400px;
+
+        right: -190px;
+        top: -240px;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(0,113,227,.6),
+                transparent 65%
+            );
+
+        filter: blur(10px);
+
+        opacity: .45;
+    }
+
+    .contact-inner {
+        position: relative;
+
+        z-index: 2;
+    }
+
+    .contact-card h3 {
+        max-width: 650px;
+
+        margin: 15px 0 13px;
+
+        font-size: clamp(34px, 5vw, 55px);
+
+        line-height: .98;
+
+        letter-spacing: -.05em;
+    }
+
+    .contact-card p {
+        max-width: 520px;
+
+        margin: 0;
+
+        color: #a1a1a6;
+
+        font-size: 14px;
+
+        line-height: 1.55;
+    }
+
+    .contact-actions {
+        margin-top: 28px;
+
+        display: flex;
+
+        gap: 8px;
+
+        flex-wrap: wrap;
+    }
+
+    .contact-card .btn-primary {
+        background: white;
+
+        color: #1d1d1f;
+    }
+
+    .contact-card .btn-secondary {
+        background: #313134;
+
+        color: white;
+    }
+
+
+    /* ==========================================================
+       FOOTER DERECHO
+    ========================================================== */
+
+    .right-footer {
+        padding: 28px 2px 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        color: var(--text-soft);
+
+        font-size: 11px;
+    }
+
+
+    /* ==========================================================
+       REVEAL
+    ========================================================== */
+
+    .reveal {
+        opacity: 0;
+
+        transform: translateY(30px);
+
+        filter: blur(6px);
+
+        transition:
+            opacity .8s cubic-bezier(.16,1,.3,1),
+            transform .8s cubic-bezier(.16,1,.3,1),
+            filter .8s ease;
+    }
+
+    .reveal.visible {
+        opacity: 1;
+
+        transform: translateY(0);
+
+        filter: blur(0);
+    }
+
+
+    /* ==========================================================
+       SIDEBAR ANIMATION
+    ========================================================== */
+
+    @keyframes sidebarEnter {
+
+        from {
+            opacity: 0;
+
+            transform: translateX(-24px);
+
+            filter: blur(7px);
+        }
+
+        to {
+            opacity: 1;
+
+            transform: translateX(0);
+
+            filter: blur(0);
+        }
+
+    }
+
+    .sidebar-inner {
+        animation:
+            sidebarEnter
+            .9s
+            cubic-bezier(.16,1,.3,1)
+            both;
+    }
+
+
+    /* ==========================================================
+       PC
+       IZQUIERDA COMPLETAMENTE FIJA Y SIN SCROLL
+    ========================================================== */
+
+    @media (min-width: 992px) {
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+        }
+
+        .portfolio-layout {
+            width: 100%;
+
+            height: 100vh;
+            height: 100dvh;
+
+            min-height: 0;
+
+            flex-direction: row;
+
+            overflow: hidden;
+        }
+
+
+        /* =====================================
+           IZQUIERDA
+
+           NO tiene scroll.
+           El contenido queda centrado
+           verticalmente dentro de la pantalla.
+        ===================================== */
+
+        .sidebar {
+            width: 38%;
+
+            height: 100vh;
+            height: 100dvh;
+
+            flex-shrink: 0;
+
+            overflow: hidden;
+
+            align-items: center;
+
+            padding:
+                clamp(18px, 3vh, 35px)
+                clamp(36px, 4.5vw, 72px);
+
+            border-right: 1px solid var(--border);
+
+            border-bottom: none;
+        }
+
+        .sidebar-inner {
+            width: 100%;
+
+            max-width: 430px;
+
+            margin: 0 auto;
+
+            max-height:
+                calc(100dvh - 36px);
+        }
+
+
+        /* DERECHA */
+
+        .main-content {
+            width: 62%;
+
+            height: 100vh;
+            height: 100dvh;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            padding:
+                0
+                clamp(35px, 5vw, 76px)
+                45px;
+
+            scroll-behavior: smooth;
+
+            scrollbar-width: thin;
+
+            scrollbar-color:
+                rgba(0,0,0,.15)
+                transparent;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+
+            background: rgba(0,0,0,.13);
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,.22);
+        }
+
+    }
+
+
+    /* ==========================================================
+       PC CON POCA ALTURA
+       Ej: notebooks 13"
+    ========================================================== */
+
+    @media (min-width: 992px) and (max-height: 820px) {
+
+        .sidebar {
+            padding-top: 18px;
+            padding-bottom: 18px;
+        }
+
+        .profile-top {
+            margin-bottom: 20px;
+        }
+
+        .avatar-wrap {
+            width: 66px;
+            height: 66px;
+        }
+
+        .profile-photo {
+            border-radius: 20px;
+        }
+
+        .availability-dot {
+            width: 17px;
+            height: 17px;
+
+            border-width: 3px;
+        }
+
+        .eyebrow {
+            margin-bottom: 9px;
+
+            font-size: 9px;
+        }
+
+        .name-title {
+            font-size: clamp(40px, 3.5vw, 53px);
+        }
+
+        .job-title {
+            margin-top: 8px;
+
+            font-size: 25px;
+        }
+
+        .location {
+            margin-top: 15px;
+
+            font-size: 11px;
+        }
+
+        .bio {
+            margin-top: 15px;
+
+            font-size: 13px;
+
+            line-height: 1.48;
+        }
+
+        .profile-actions {
+            margin-top: 18px;
+        }
+
+        .btn {
+            min-height: 38px;
+
+            padding-left: 14px;
+            padding-right: 14px;
+
+            font-size: 11px;
+        }
+
+        .social-area {
+            margin-top: 18px;
+
+            padding-top: 15px;
+        }
+
+        .social-label {
+            margin-bottom: 9px;
+        }
+
+        .social-link {
+            width: 35px;
+            height: 35px;
+        }
+
+        .social-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .sidebar-footer {
+            margin-top: 18px;
+
+            font-size: 10px;
+        }
+
+    }
+
+
+    /* ==========================================================
+       PC MUY BAJO
+       Mantiene TODO visible sin scroll
+    ========================================================== */
+
+    @media (min-width: 992px) and (max-height: 690px) {
+
+        .sidebar {
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        .profile-top {
+            margin-bottom: 14px;
+        }
+
+        .avatar-wrap {
+            width: 56px;
+            height: 56px;
+        }
+
+        .profile-photo {
+            border-radius: 17px;
+        }
+
+        .profile-meta strong {
+            font-size: 13px;
+        }
+
+        .profile-meta span {
+            font-size: 11px;
+        }
+
+        .eyebrow {
+            margin-bottom: 7px;
+        }
+
+        .name-title {
+            font-size: 38px;
+        }
+
+        .job-title {
+            margin-top: 6px;
+
+            font-size: 21px;
+        }
+
+        .location {
+            margin-top: 10px;
+        }
+
+        .bio {
+            margin-top: 11px;
+
+            font-size: 12px;
+
+            line-height: 1.4;
+        }
+
+        .profile-actions {
+            margin-top: 13px;
+        }
+
+        .btn {
+            min-height: 34px;
+        }
+
+        .social-area {
+            margin-top: 13px;
+
+            padding-top: 12px;
+        }
+
+        .social-label {
+            margin-bottom: 7px;
+        }
+
+        .social-link {
+            width: 32px;
+            height: 32px;
+        }
+
+        .sidebar-footer {
+            margin-top: 13px;
+        }
+
+    }
+
+
+    /* ==========================================================
+       TABLET
+    ========================================================== */
+
+    @media (max-width: 991px) {
+
+        /*
+           En tablet/móvil deja de ser split fijo.
+           Todo vuelve a tener scroll normal.
+        */
+
+        html,
+        body {
+            overflow: auto;
+        }
+
+        .sidebar {
+            min-height: auto;
+        }
+
+        .sidebar-inner {
+            max-width: 680px;
+        }
+
+        .main-content {
+            padding-top: 0;
+        }
+
+        .right-navbar-shell {
+            top: 0;
+        }
+
+    }
+
+
+    /* ==========================================================
+       MOBILE
+    ========================================================== */
+
+    @media (max-width: 700px) {
+
+        .sidebar {
+            padding:
+                50px
+                22px
+                48px;
+        }
+
+        .avatar-wrap {
+            width: 70px;
+            height: 70px;
+        }
+
+        .profile-photo {
+            border-radius: 21px;
+        }
+
+        .name-title {
+            font-size: clamp(45px, 14vw, 62px);
+        }
+
+        .job-title {
+            font-size: 27px;
+        }
+
+        .profile-actions {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+        }
+
+        .profile-actions .btn {
+            width: 100%;
+        }
+
+        .main-content {
+            padding:
+                0
+                18px
+                45px;
+        }
+
+        .right-navbar-shell {
+            padding-top: 12px;
+        }
+
+        .right-navbar {
+            width: 100%;
+
+            justify-content: center;
+        }
+
+        .right-navbar a {
+            flex: 1;
+
+            text-align: center;
+
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .video-card {
+            border-radius: 23px;
+        }
+
+        .video-overlay {
+            padding: 17px;
+        }
+
+        .video-controls {
+            gap: 6px;
+        }
+
+        .video-control {
+            width: 37px;
+            height: 37px;
+        }
+
+        .video-bottom h2 {
+            font-size: 27px;
+        }
+
+        .video-bottom p {
+            font-size: 11px;
+        }
+
+        .intro {
+            padding: 65px 0 55px;
+        }
+
+        .intro h2 {
+            font-size: clamp(40px, 12vw, 55px);
+        }
+
+        .intro-description {
+            font-size: 15px;
+        }
+
+        .section-heading {
+            flex-direction: column;
+
+            align-items: flex-start;
+
+            gap: 12px;
+        }
+
+        .stack-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .project-card {
+            padding: 24px;
+        }
+
+        .project-detail-grid {
+            grid-template-columns: 1fr;
+
+            gap: 22px;
+        }
+
+        .contact-card {
+            padding: 30px 24px;
+
+            border-radius: 24px;
+        }
+
+        .right-footer {
+            flex-direction: column;
+
+            align-items: flex-start;
+        }
+
+    }
+
+
+    /* ==========================================================
+       VERY SMALL MOBILE
+    ========================================================== */
+
+    @media (max-width: 430px) {
+
+        .profile-actions {
+            grid-template-columns: 1fr;
+        }
+
+        .video-bottom p {
+            display: none;
+        }
+
+        .video-badge {
+            padding: 6px 9px;
+
+            font-size: 9px;
+        }
+
+        .video-control {
+            width: 34px;
+            height: 34px;
+        }
+
+        .project-heading {
+            gap: 10px;
+        }
+
+    }
+
+
+    /* ==========================================================
+       FULLSCREEN VIDEO
+    ========================================================== */
+
+    .video-card:fullscreen {
+        width: 100vw;
+        height: 100vh;
+
+        border-radius: 0;
+
+        background: black;
+    }
+
+    .video-card:fullscreen .presentation-video {
+        width: 100%;
+        height: 100%;
+
+        aspect-ratio: auto;
+
+        object-fit: contain;
+    }
+
+    .video-card:-webkit-full-screen {
+        width: 100vw;
+        height: 100vh;
+
+        border-radius: 0;
+
+        background: black;
+    }
+
+    .video-card:-webkit-full-screen .presentation-video {
+        width: 100%;
+        height: 100%;
+
+        object-fit: contain;
+    }
+
+
+    /* ==========================================================
+       REDUCED MOTION
+    ========================================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: .01ms !important;
+
+            transition-duration: .01ms !important;
+
+            scroll-behavior: auto !important;
+        }
+
+        .reveal {
+            opacity: 1;
+
+            transform: none;
+
+            filter: none;
+        }
+
+    }
+
+</style>
+
+
+{% if profile %}
+
+<div class="portfolio-layout">
+
+
+    <!-- ======================================================
+         IZQUIERDA
+    ======================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-inner">
+
+
+            <div class="profile-top">
+
+                <div class="avatar-wrap">
+
+                    <img
+                        src="{% static 'images/profile.jpg' %}"
+                        alt="{{ profile.name }}"
+                        class="profile-photo"
+                    >
+
+                    <span class="availability-dot"></span>
+
+                </div>
+
+
+                <div class="profile-meta">
+
+                    <strong>
+                        {{ profile.name }}
+                    </strong>
+
+                    <span>
+                        Developer · Argentina
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="eyebrow">
+                Software · Engineering
+            </div>
+
+
+            <h1 class="name-title">
+                {{ profile.name }}
+            </h1>
+
+
+            <h2 class="job-title">
+                {{ profile.hero_title }}
+            </h2>
+
+
+
+            {% if profile.location %}
+
+                <div class="location">
+
+                    <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+
+                        <path
+                            d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"
+                        ></path>
+
+                        <circle
+                            cx="12"
+                            cy="10"
+                            r="3"
+                        ></circle>
+
+                    </svg>
+
+                    {{ profile.location }}
+
+                </div>
+
+            {% endif %}
+
+
+
+            <p class="bio">
+                {{ profile.bio_p1 }}
+            </p>
+
+
+
+            <div class="profile-actions">
+
+                <a
+                    href="{% static 'files/cv-sebastian-villalba.pdf' %}"
+                    target="_blank"
+                    class="btn btn-primary"
+                >
+                    Ver CV
+                </a>
+
+
+                <a
+                    href="{% static 'files/cv-sebastian-villalba.pdf' %}"
+                    download
+                    class="btn btn-secondary"
+                >
+                    Descargar ↓
+                </a>
+
+            </div>
+
+
+
+            <div class="social-area">
+
+                <div class="social-label">
+                    Encontrame en
+                </div>
+
+
+                <div class="social-row">
+
+
+                    <!-- GITHUB -->
+
+                    <a
+                        href="https://github.com/TU-USUARIO"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="social-link"
+                        aria-label="GitHub"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path d="M12 .7C5.7.7.6 5.8.6 12.1c0 5 3.3 9.3 7.8 10.8.6.1.8-.3.8-.6v-2.1c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.8-1.6-2.5-.3-5.2-1.3-5.2-5.6 0-1.2.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2A11 11 0 0112 6.1c1 0 2 .1 2.9.4 2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.3-5.2 5.6.4.4.8 1.1.8 2.2v3c0 .4.2.7.8.6 4.5-1.5 7.8-5.8 7.8-10.8C23.4 5.8 18.3.7 12 .7z"/>
+                        </svg>
+
+                    </a>
+
+
+
+                    <!-- LINKEDIN -->
+
+                    <a
+                        href="https://linkedin.com/in/TU-USUARIO"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="social-link"
+                        aria-label="LinkedIn"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path d="M5.3 7.9H1.7V22h3.6V7.9zM3.5 2A2.1 2.1 0 103.5 6.2 2.1 2.1 0 003.5 2zM22.3 13.9c0-4.2-2.2-6.2-5.2-6.2-2.4 0-3.5 1.3-4.1 2.2V7.9H9.4V22H13v-7c0-1.8.3-3.6 2.7-3.6 2.3 0 2.4 2.2 2.4 3.7V22h3.6z"/>
+                        </svg>
+
+                    </a>
+
+
+
+                    <!-- YOUTUBE -->
+
+                    <a
+                        href="https://youtube.com/@TU-USUARIO"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="social-link"
+                        aria-label="YouTube"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 00.5 6.2 31 31 0 000 12a31 31 0 00.5 5.8 3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1A31 31 0 0024 12a31 31 0 00-.5-5.8zM9.6 15.6V8.4L15.8 12z"/>
+                        </svg>
+
+                    </a>
+
+
+
+                    <!-- EMAIL -->
+
+                    <a
+                        href="mailto:tu-email@email.com"
+                        class="social-link"
+                        aria-label="Email"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+
+                            <rect
+                                x="3"
+                                y="5"
+                                width="18"
+                                height="14"
+                                rx="2"
+                            ></rect>
+
+                            <path d="m3 7 9 6 9-6"></path>
+
+                        </svg>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+
+            <div class="sidebar-footer">
+
+                <span class="available">
+                    Disponible
+                </span>
+
+                <span>
+                    © 2026
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ======================================================
+         DERECHA
+    ======================================================= -->
+
+    <main
+        class="main-content"
+        id="mainScroll"
+    >
+
+        <div class="main-inner">
+
+
+            <!-- =================================================
+                 NAVBAR
+            ================================================== -->
+
+            <div class="right-navbar-shell">
+
+                <nav class="right-navbar">
+
+                    <a href="#stack">
+                        Stack
+                    </a>
+
+                    <a href="#projects">
+                        Proyectos
+                    </a>
+
+                    <a href="#contact">
+                        Contacto
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 VIDEO
+            ================================================== -->
+
+            <section
+                class="video-card reveal"
+                id="videoCard"
+            >
+
+
+                <video
+                    id="presentationVideo"
+                    class="presentation-video"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="auto"
+                >
+
+                    <source
+                        src="https://www.w3schools.com/html/mov_bbb.mp4"
+                        type="video/mp4"
+                    >
+
+                </video>
+
+
+
+                <div class="video-overlay">
+
+
+                    <div class="video-top">
+
+
+                        <span class="video-badge">
+                            Presentación
+                        </span>
+
+
+
+                        <!-- CONTROLES -->
+
+                        <div class="video-controls">
+
+
+                            <!-- SONIDO -->
+
+                            <button
+                                type="button"
+                                class="video-control"
+                                id="soundButton"
+                                aria-label="Activar sonido"
+                                title="Activar sonido"
+                            >
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                >
+
+                                    <path d="M11 5 6 9H2v6h4l5 4z"></path>
+
+                                    <path d="m22 9-6 6"></path>
+
+                                    <path d="m16 9 6 6"></path>
+
+                                </svg>
+
+                            </button>
+
+
+
+                            <!-- FULLSCREEN -->
+
+                            <button
+                                type="button"
+                                class="video-control"
+                                id="fullscreenButton"
+                                aria-label="Pantalla completa"
+                                title="Pantalla completa"
+                            >
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+
+                                    <path d="M8 3H3v5"></path>
+
+                                    <path d="M16 3h5v5"></path>
+
+                                    <path d="M8 21H3v-5"></path>
+
+                                    <path d="M16 21h5v-5"></path>
+
+                                </svg>
+
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="video-bottom">
+
+                        <h2>
+                            Hola, soy {{ profile.name }}.
+                        </h2>
+
+                        <p>
+                            Desarrollo software, exploro nuevas ideas
+                            y construyo sistemas donde ingeniería,
+                            producto y tecnología trabajan juntos.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 INTRO
+            ================================================== -->
+
+            <section class="intro reveal">
+
+                <span class="section-kicker">
+                    Mi forma de trabajar
+                </span>
+
+
+                <h2>
+
+                    Construyo software.
+
+                    <span>
+                        Pero primero entiendo el problema.
+                    </span>
+
+                </h2>
+
+
+                <p class="intro-description">
+
+                    Me interesa trabajar desde la idea inicial
+                    hasta la arquitectura y la implementación.
+                    No solamente escribir código, sino entender
+                    qué estamos construyendo y por qué.
+
+                </p>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 STACK
+            ================================================== -->
+
+            <section
+                class="content-section"
+                id="stack"
+            >
+
+                <div class="section-heading reveal">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Tecnologías
+                        </span>
+
+                        <h3>
+                            Stack.
+                        </h3>
+
+                    </div>
+
+
+                    <p>
+                        Tocá una categoría para explorar
+                        las tecnologías que utilizo.
+                    </p>
+
+                </div>
+
+
+
+                {% if profile.arsenal %}
+
+                    <div class="stack-grid">
+
+
+                        {% for category in profile.arsenal %}
+
+                            <button
+                                type="button"
+                                class="stack-card reveal"
+                            >
+
+
+                                <div class="stack-number">
+                                    0{{ forloop.counter }}
+                                </div>
+
+
+                                <div class="stack-top">
+
+                                    <strong>
+                                        {{ category.category }}
+                                    </strong>
+
+
+                                    <span class="expand-icon">
+                                        +
+                                    </span>
+
+                                </div>
+
+
+
+                                <div class="stack-details">
+
+                                    <div class="stack-details-inner">
+
+
+                                        <div class="stack-list">
+
+                                            {% for skill in category.skills %}
+
+                                                <span class="stack-pill">
+                                                    {{ skill }}
+                                                </span>
+
+                                            {% endfor %}
+
+                                        </div>
+
+
+                                        <div class="stack-hint">
+
+                                            Tecnologías y herramientas
+                                            que utilizo actualmente en
+                                            proyectos y experimentos.
+
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+
+
+                            </button>
+
+                        {% endfor %}
+
+
+                    </div>
+
                 {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>Todavía no cargaste proyectos en el panel.</p>
-    {% endif %}
+
+            </section>
+
+
+
+            <!-- =================================================
+                 PROJECTS
+            ================================================== -->
+
+            <section
+                class="content-section"
+                id="projects"
+            >
+
+                <div class="section-heading reveal">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            Selected work
+                        </span>
+
+                        <h3>
+                            Proyectos.
+                        </h3>
+
+                    </div>
+
+
+                    <p>
+                        Tocá un proyecto para abrir
+                        más información sin salir del portfolio.
+                    </p>
+
+                </div>
+
+
+
+                {% if projects %}
+
+                    <div class="project-list">
+
+
+                        {% for project in projects %}
+
+                            <article
+                                class="project-card reveal"
+                            >
+
+
+                                <div class="project-glow"></div>
+
+
+                                <div class="project-content">
+
+
+                                    <div class="project-meta">
+
+                                        <span class="project-number">
+                                            0{{ forloop.counter }}
+                                        </span>
+
+
+                                        {% if project.category %}
+
+                                            <span class="project-category">
+                                                {{ project.category }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+
+                                    <div class="project-heading">
+
+
+                                        <div>
+
+                                            <h4>
+                                                {{ project.title }}
+                                            </h4>
+
+
+                                            <p class="project-description">
+                                                {{ project.short_description }}
+                                            </p>
+
+                                        </div>
+
+
+                                        <span class="project-expand">
+                                            +
+                                        </span>
+
+
+                                    </div>
+
+
+
+                                    <div class="project-details">
+
+
+                                        <div class="project-details-inner">
+
+
+                                            <div class="project-detail-grid">
+
+
+                                                <div class="detail-item">
+
+                                                    <span>
+                                                        Tipo
+                                                    </span>
+
+                                                    <strong>
+
+                                                        {% if project.category %}
+                                                            {{ project.category }}
+                                                        {% else %}
+                                                            Software
+                                                        {% endif %}
+
+                                                    </strong>
+
+                                                </div>
+
+
+
+                                                <div class="detail-item">
+
+                                                    <span>
+                                                        Estado
+                                                    </span>
+
+                                                    <strong>
+                                                        En desarrollo
+                                                    </strong>
+
+                                                </div>
+
+
+
+                                                <div class="detail-item">
+
+                                                    <span>
+                                                        Enfoque
+                                                    </span>
+
+                                                    <strong>
+                                                        Producto + Ingeniería
+                                                    </strong>
+
+                                                </div>
+
+
+                                            </div>
+
+
+
+                                            <div class="project-footer">
+
+
+                                                <span class="project-status">
+                                                    Proyecto activo
+                                                </span>
+
+
+
+                                                {% if project.youtube_url %}
+
+                                                    <a
+                                                        href="{{ project.youtube_url }}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="project-link"
+                                                        onclick="event.stopPropagation();"
+                                                    >
+
+                                                        Ver demo
+
+                                                        <span class="project-link-circle">
+                                                            ↗
+                                                        </span>
+
+                                                    </a>
+
+                                                {% endif %}
+
+
+                                            </div>
+
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </article>
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% endif %}
+
+            </section>
+
+
+
+            <!-- =================================================
+                 CONTACTO
+            ================================================== -->
+
+            <section
+                class="content-section"
+                id="contact"
+            >
+
+                <div class="contact-card reveal">
+
+
+                    <div class="contact-inner">
+
+
+                        <span class="section-kicker">
+                            Contacto
+                        </span>
+
+
+                        <h3>
+                            Construyamos algo interesante.
+                        </h3>
+
+
+                        <p>
+
+                            Software, sistemas, ingeniería,
+                            experimentación y nuevos productos.
+
+                        </p>
+
+
+
+                        <div class="contact-actions">
+
+
+                            <a
+                                href="mailto:tu-email@email.com"
+                                class="btn btn-primary"
+                            >
+                                Escribirme
+                            </a>
+
+
+                            <a
+                                href="{% static 'files/cv-sebastian-villalba.pdf' %}"
+                                target="_blank"
+                                class="btn btn-secondary"
+                            >
+                                Ver CV
+                            </a>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="right-footer">
+
+                    <span>
+                        {{ profile.name }}
+                    </span>
+
+                    <span>
+                        Software · Systems · Product
+                    </span>
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+</div>
+
+
+{% else %}
+
+
+<div
+    style="
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    "
+>
+
+    <div>
+
+        <h1>
+            Portfolio en mantenimiento.
+        </h1>
+
+        <p style="color:#86868b;">
+            Configurá tu perfil desde el panel.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% endif %}
+
+
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+
+            /* ==================================================
+               SCROLL REVEAL
+            ================================================== */
+
+            const revealElements =
+                document.querySelectorAll(".reveal");
+
+
+            const observer =
+                new IntersectionObserver(
+
+                    function(entries) {
+
+                        entries.forEach(function(entry) {
+
+                            if (entry.isIntersecting) {
+
+                                entry.target.classList.add(
+                                    "visible"
+                                );
+
+                                observer.unobserve(
+                                    entry.target
+                                );
+
+                            }
+
+                        });
+
+                    },
+
+                    {
+                        threshold: 0.10,
+                        rootMargin: "0px 0px -30px 0px"
+                    }
+
+                );
+
+
+            revealElements.forEach(
+                function(element) {
+
+                    observer.observe(element);
+
+                }
+            );
+
+
+
+            /* ==================================================
+               STACK
+            ================================================== */
+
+            const stackCards =
+                document.querySelectorAll(".stack-card");
+
+
+            stackCards.forEach(function(card) {
+
+                card.addEventListener(
+                    "click",
+                    function() {
+
+                        card.classList.toggle("open");
+
+                    }
+                );
+
+            });
+
+
+
+            /* ==================================================
+               PROJECTS
+            ================================================== */
+
+            const projectCards =
+                document.querySelectorAll(".project-card");
+
+
+            projectCards.forEach(function(card) {
+
+                card.addEventListener(
+                    "click",
+                    function() {
+
+                        card.classList.toggle("open");
+
+                    }
+                );
+
+            });
+
+
+
+            /* ==================================================
+               VIDEO
+            ================================================== */
+
+            const video =
+                document.getElementById(
+                    "presentationVideo"
+                );
+
+            const videoCard =
+                document.getElementById(
+                    "videoCard"
+                );
+
+            const soundButton =
+                document.getElementById(
+                    "soundButton"
+                );
+
+            const fullscreenButton =
+                document.getElementById(
+                    "fullscreenButton"
+                );
+
+
+
+            /* ---------------------------
+               SONIDO
+            --------------------------- */
+
+            if (video && soundButton) {
+
+                soundButton.addEventListener(
+                    "click",
+                    function() {
+
+                        video.muted = !video.muted;
+
+
+                        if (video.muted) {
+
+                            soundButton.innerHTML = `
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                >
+
+                                    <path d="M11 5 6 9H2v6h4l5 4z"></path>
+
+                                    <path d="m22 9-6 6"></path>
+
+                                    <path d="m16 9 6 6"></path>
+
+                                </svg>
+
+                            `;
+
+                            soundButton.title =
+                                "Activar sonido";
+
+                        }
+
+                        else {
+
+                            soundButton.innerHTML = `
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                >
+
+                                    <path d="M11 5 6 9H2v6h4l5 4z"></path>
+
+                                    <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+
+                                    <path d="M18 6a8 8 0 0 1 0 12"></path>
+
+                                </svg>
+
+                            `;
+
+                            soundButton.title =
+                                "Silenciar";
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+
+            /* ---------------------------
+               FULLSCREEN
+            --------------------------- */
+
+            if (
+                videoCard &&
+                fullscreenButton
+            ) {
+
+                fullscreenButton.addEventListener(
+                    "click",
+                    function() {
+
+
+                        /*
+                           Si ya estamos en fullscreen,
+                           salimos.
+                        */
+
+                        if (
+                            document.fullscreenElement ||
+                            document.webkitFullscreenElement
+                        ) {
+
+                            if (document.exitFullscreen) {
+
+                                document.exitFullscreen();
+
+                            }
+
+                            else if (
+                                document.webkitExitFullscreen
+                            ) {
+
+                                document.webkitExitFullscreen();
+
+                            }
+
+                            return;
+
+                        }
+
+
+
+                        /*
+                           Entrar en pantalla completa.
+                        */
+
+                        if (
+                            videoCard.requestFullscreen
+                        ) {
+
+                            videoCard.requestFullscreen();
+
+                        }
+
+                        else if (
+                            videoCard.webkitRequestFullscreen
+                        ) {
+
+                            videoCard.webkitRequestFullscreen();
+
+                        }
+
+                        /*
+                           Safari iPhone puede usar
+                           fullscreen directamente
+                           sobre el elemento video.
+                        */
+
+                        else if (
+                            video.webkitEnterFullscreen
+                        ) {
+
+                            video.webkitEnterFullscreen();
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+        }
+    );
+
+</script>
+
 
 {% endblock content %}
+
 
 {% block footer %}
 {% endblock footer %}

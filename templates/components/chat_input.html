@@ -1,0 +1,130 @@
+<div class="study-input-wrapper">
+
+    <form
+        class="study-input"
+        method="POST"
+        id="chat-form"
+    >
+        {% csrf_token %}
+
+
+        <!-- TEXTAREA -->
+        <textarea
+            class="study-textarea"
+            name="message"
+            id="study-textarea"
+            placeholder="Preguntá lo que quieras..."
+            rows="1"
+            autocomplete="off"
+        ></textarea>
+
+
+        <!-- VALORES QUE RECIBE DJANGO -->
+        <input
+            type="hidden"
+            name="chat_mode"
+            id="chat-mode-input"
+            value="general"
+        >
+
+        <input
+            type="hidden"
+            name="response_length"
+            id="response-length-input"
+            value="normal"
+        >
+
+        <input
+            type="hidden"
+            name="memory_enabled"
+            id="memory-input"
+            value="true"
+        >
+
+
+        <!-- ACCIONES -->
+        <div class="study-actions">
+
+            <!-- OPCIONES / SETTINGS -->
+            <button
+                type="button"
+                class="study-options-button"
+                id="open-chat-settings"
+                aria-label="Opciones del chat"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M4 7H14"></path>
+                    <path d="M18 7H20"></path>
+
+                    <circle
+                        cx="16"
+                        cy="7"
+                        r="2"
+                    ></circle>
+
+
+                    <path d="M4 17H8"></path>
+                    <path d="M12 17H20"></path>
+
+                    <circle
+                        cx="10"
+                        cy="17"
+                        r="2"
+                    ></circle>
+                </svg>
+            </button>
+
+
+            <!-- ENVIAR -->
+            <button
+                type="submit"
+                class="study-send"
+                id="study-send"
+                aria-label="Enviar mensaje"
+                disabled
+            >
+
+                <!-- ESTADO VACÍO -->
+                <svg
+                    class="send-icon-empty"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M12 3L13.3 8.7L19 10L13.3 11.3L12 17L10.7 11.3L5 10L10.7 8.7L12 3Z"></path>
+
+                    <path d="M18.5 15L19.2 17.8L22 18.5L19.2 19.2L18.5 22L17.8 19.2L15 18.5L17.8 17.8L18.5 15Z"></path>
+                </svg>
+
+
+                <!-- ESTADO CON TEXTO -->
+                <svg
+                    class="send-icon-active"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M12 18V6"></path>
+                    <path d="M7 11L12 6L17 11"></path>
+                </svg>
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

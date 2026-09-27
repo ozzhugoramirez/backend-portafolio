@@ -41,15 +41,36 @@ class HomeView(View):
 
 # --- VISTA DEL DASHBOARD ---
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'pages/dashboard.html'
+    template_name = 'pages/dashboard/index.html'
     login_url = '/login/' # Si no está logueado, lo manda acá
 
 class LoginView(TemplateView):
     template_name = 'account/login.html'
 
 
+class InformationView(View):
+
+    def get(self, request):
+        return render(request, "pages/dashboard/information.html")
 
 
+class ProjectsView(View):
+
+    def get(self, request):
+        return render(request, "pages/dashboard/projects.html")
+
+
+class NotesView(View):
+
+    def get(self, request):
+        return render(request, "pages/dashboard/notes.html")
+
+
+
+class OloView(View):
+
+    def get(self, request):
+        return render(request, "pages/OLO/base.html")
 
 class PasskeyRegisterOptionsAPIView(APIView):
     authentication_classes = [SessionAuthentication]
