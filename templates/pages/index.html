@@ -2093,7 +2093,7 @@
             <div class="profile-actions">
 
                 <a
-                    href="{% static 'files/cv-sebastian-villalba.pdf' %}"
+                    href="{{ profile.cv_file.url }}"
                     target="_blank"
                     class="btn btn-primary"
                 >
@@ -2102,7 +2102,7 @@
 
 
                 <a
-                    href="{% static 'files/cv-sebastian-villalba.pdf' %}"
+                    href="{{ profile.cv_file.url }}"
                     download
                     class="btn btn-secondary"
                 >
@@ -2818,7 +2818,7 @@
 
 
                             <a
-                                href="{% static 'files/cv-sebastian-villalba.pdf' %}"
+                                href="{{ profile.cv_file.url }}"
                                 target="_blank"
                                 class="btn btn-secondary"
                             >
