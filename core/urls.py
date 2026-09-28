@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/auth/passkey/register/verify/', PasskeyRegisterVerifyAPIView.as_view(), name='passkey_register_verify'),
     path('api/', include('api.urls')),
     path("", HomeView.as_view(), name="home"),
+    path('olo/', include('olo.urls')),
 
     path(
         "information/",

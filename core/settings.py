@@ -29,9 +29,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'api',
     'chat',
-    'study',
     'planner',
     'bazar',
+    'olo',
 ]
 
 MIDDLEWARE = [
