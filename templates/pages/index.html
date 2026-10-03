@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 
@@ -2092,19 +2091,23 @@
 
             <div class="profile-actions">
 
+                <!-- BOTÓN VER CV -->
                 <a
                     href="{{ profile.cv_file.url }}"
                     target="_blank"
                     class="btn btn-primary"
+                    onclick="registrarClicCV('cv_view')"
                 >
                     Ver CV
                 </a>
 
 
+                <!-- BOTÓN DESCARGAR CV -->
                 <a
                     href="{{ profile.cv_file.url }}"
                     download
                     class="btn btn-secondary"
+                    onclick="registrarClicCV('cv_download')"
                 >
                     Descargar ↓
                 </a>
@@ -2817,10 +2820,12 @@
                             </a>
 
 
+                            <!-- TERCER BOTÓN VER CV (CONTACTO) -->
                             <a
                                 href="{{ profile.cv_file.url }}"
                                 target="_blank"
                                 class="btn btn-secondary"
+                                onclick="registrarClicCV('cv_view')"
                             >
                                 Ver CV
                             </a>
@@ -2894,6 +2899,15 @@
 
 
 <script>
+
+    /* ==================================================
+       FUNCIÓN PARA REGISTRAR CLICS EN EL CV
+    ================================================== */
+    function registrarClicCV(accion) {
+        fetch(`/api/track/${accion}/`, { method: 'GET' })
+            .catch(err => console.error("Error tracking CV", err));
+    }
+
 
     document.addEventListener(
         "DOMContentLoaded",

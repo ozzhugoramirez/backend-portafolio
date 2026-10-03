@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import View
-from api.models import Profile, Project
+from api.models import *
 import json
 import hashlib
 import uuid
@@ -22,27 +22,108 @@ from webauthn import generate_registration_options, verify_registration_response
 from webauthn.helpers.structs import AuthenticatorSelectionCriteria, ResidentKeyRequirement
 from webauthn.helpers import bytes_to_base64url
 
+
+from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.utils import timezone
+
+
+# 1. Vista para URLs personalizadas
+class SocialRedirectView(View):
+    source_name = 'Directo'
+    def get(self, request, *args, **kwargs):
+        # Guardamos el origen en la sesión del usuario
+        request.session['visit_source'] = self.source_name
+        request.session['visit_tracked'] = False # Forzamos a que se cuente como visita nueva
+        return redirect('home')
+
+# 2. API para los clics en el CV
+def track_action(request, action):
+    if action not in ['cv_view', 'cv_download']:
+        return JsonResponse({'error': 'Acción inválida'}, status=400)
+
+    source = request.session.get('visit_source', 'Directo')
+    today = timezone.now().date()
+    metric, _ = AnalyticsMetric.objects.get_or_create(date=today, source=source)
+
+    if action == 'cv_view':
+        metric.cv_views += 1
+    elif action == 'cv_download':
+        metric.cv_downloads += 1
+
+    metric.save()
+    return JsonResponse({'status': 'ok'})
+
+
+
+
+
+
+
+
 class HomeView(View):
     def get(self, request):
-        
+        # Tracking de visita
+        if not request.session.get('visit_tracked'):
+            source = request.session.get('visit_source', 'Directo')
+            today = timezone.now().date()
+            metric, _ = AnalyticsMetric.objects.get_or_create(date=today, source=source)
+            metric.visits += 1
+            metric.save()
+            request.session['visit_tracked'] = True # Evita que si recarga la página sume otra visita
+
         profile = Profile.objects.first()
-        
-       
         projects = Project.objects.filter(is_public=True)
-
-        context = {
-            'profile': profile,
-            'projects': projects,
-        }
-
-        return render(request, "pages/index.html", context)
+        return render(request, "pages/index.html", {'profile': profile, 'projects': projects})
 
 
 
-# --- VISTA DEL DASHBOARD ---
+from datetime import timedelta
+
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'pages/dashboard/index.html'
-    login_url = '/login/' # Si no está logueado, lo manda acá
+    login_url = '/login/' 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        today = timezone.now().date()
+        # Encontramos el lunes de esta semana
+        start_of_week = today - timedelta(days=today.weekday()) 
+
+        metrics = AnalyticsMetric.objects.all().order_by('-date')
+        
+        current_week = {}
+        historical = {}
+
+        for m in metrics:
+            if m.date >= start_of_week:
+                # Pertenece a esta semana (día por día)
+                date_str = m.date.strftime('%Y-%m-%d')
+                if date_str not in current_week:
+                    current_week[date_str] = {'date': m.date, 'visits': 0, 'views': 0, 'downloads': 0, 'sources': set()}
+                current_week[date_str]['visits'] += m.visits
+                current_week[date_str]['views'] += m.cv_views
+                current_week[date_str]['downloads'] += m.cv_downloads
+                current_week[date_str]['sources'].add(m.source)
+            else:
+                # Semanas pasadas (agrupamos todo desde el lunes de esa semana)
+                week_start = m.date - timedelta(days=m.date.weekday())
+                week_str = week_start.strftime('%Y-%m-%d')
+                if week_str not in historical:
+                    historical[week_str] = {'week_start': week_start, 'visits': 0, 'views': 0, 'downloads': 0}
+                historical[week_str]['visits'] += m.visits
+                historical[week_str]['views'] += m.cv_views
+                historical[week_str]['downloads'] += m.cv_downloads
+
+        # Convertimos los sets a strings separados por coma y ordenamos de más reciente a más viejo
+        for day in current_week.values():
+            day['sources'] = ", ".join(day['sources'])
+
+        context['current_week'] = sorted(current_week.values(), key=lambda x: x['date'], reverse=True)
+        context['historical'] = sorted(historical.values(), key=lambda x: x['week_start'], reverse=True)
+
+        return context
 
 class LoginView(TemplateView):
     template_name = 'account/login.html'
@@ -71,6 +152,13 @@ class OloView(View):
 
     def get(self, request):
         return render(request, "pages/OLO/base.html")
+
+
+
+
+
+
+
 
 class PasskeyRegisterOptionsAPIView(APIView):
     authentication_classes = [SessionAuthentication]

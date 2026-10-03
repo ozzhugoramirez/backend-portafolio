@@ -31,6 +31,17 @@ urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path('olo/', include('olo.urls')),
 
+
+
+
+    # URLs cortas para redes sociales
+    path('i/', SocialRedirectView.as_view(source_name='Instagram'), name='go_ig'),
+    path('t/', SocialRedirectView.as_view(source_name='TikTok'), name='go_tk'),
+    path('l/', SocialRedirectView.as_view(source_name='LinkedIn'), name='go_in'),
+    
+    # Endpoint para clics de CV
+    path('api/track/<str:action>/', track_action, name='track_action'),
+
     path(
         "information/",
         InformationView.as_view(),

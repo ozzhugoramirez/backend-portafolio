@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 def default_work_philosophy():
@@ -128,6 +129,24 @@ def default_changelog():
     return [
         {"version": "v1.0.4", "date": "10 Mar 2026", "updates": ["Mejora A", "Fix B"]}
     ]
+
+
+
+
+
+class AnalyticsMetric(models.Model):
+    date = models.DateField(default=timezone.now)
+    source = models.CharField(max_length=50, default='Directo') # Instagram, TikTok, LinkedIn, etc.
+    visits = models.PositiveIntegerField(default=0)
+    cv_views = models.PositiveIntegerField(default=0)
+    cv_downloads = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        # Evita duplicados: solo puede haber un registro por día y por origen
+        unique_together = ('date', 'source')
+
+    def __str__(self):
+        return f"{self.date} - {self.source}"
 
 
 

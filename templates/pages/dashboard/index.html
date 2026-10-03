@@ -213,6 +213,7 @@
     .glass-card {
 
         padding: 28px;
+        margin-bottom: 30px;
 
         border-radius: 27px;
 
@@ -432,6 +433,37 @@
         color: #888;
 
     }
+    
+    /* TABLAS DE ANALÍTICAS */
+    .stats-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    .stats-table th {
+        text-align: left;
+        color: #777;
+        font-weight: 600;
+        padding: 10px 5px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .stats-table td {
+        padding: 12px 5px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        color: #333;
+    }
+    .stats-table tr:last-child td {
+        border-bottom: none;
+    }
+    .metric-badge {
+        background: #111;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
 
 
     @media(max-width: 650px) {
@@ -578,11 +610,82 @@
             </h1>
 
             <p class="dashboard-description">
-                Administrá el acceso seguro a tu cuenta.
+                Administrá las analíticas de tu portafolio y el acceso seguro a tu cuenta.
             </p>
 
         </section>
 
+        <!-- SEMANA ACTUAL -->
+        <section class="glass-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Semana Actual (Diario)</h2>
+                    <p class="card-subtitle">Rendimiento día por día de tu portafolio</p>
+                </div>
+            </div>
+            
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Orígenes</th>
+                        <th>Visitas</th>
+                        <th>Vistas CV</th>
+                        <th>Descargas CV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for day in current_week %}
+                    <tr>
+                        <td>{{ day.date|date:"l d M" }}</td>
+                        <td style="color: #666; font-size: 12px;">{{ day.sources }}</td>
+                        <td><span class="metric-badge">{{ day.visits }}</span></td>
+                        <td>{{ day.views }}</td>
+                        <td>{{ day.downloads }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; padding: 20px;">Sin datos registrados esta semana.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- HISTORIAL SEMANAL -->
+        <section class="glass-card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Histórico (Semanal)</h2>
+                    <p class="card-subtitle">Acumulado total de las semanas anteriores</p>
+                </div>
+            </div>
+            
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Semana del</th>
+                        <th>Visitas Totales</th>
+                        <th>Vistas CV</th>
+                        <th>Descargas CV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for week in historical %}
+                    <tr>
+                        <td>{{ week.week_start|date:"d M Y" }}</td>
+                        <td><span class="metric-badge">{{ week.visits }}</span></td>
+                        <td>{{ week.views }}</td>
+                        <td>{{ week.downloads }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #888; padding: 20px;">No hay historial todavía.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
 
 
         <!-- PASSKEY CARD -->
