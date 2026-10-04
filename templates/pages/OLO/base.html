@@ -1,39 +1,43 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>memory-study</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Memory Study</title>
+
     <link
         rel="stylesheet"
         href="{% static 'css/chat.css' %}"
     >
 </head>
+
 <body>
-    {% block navbar %}{% endblock navbar %}
+
+    {% block navbar %}
+    {% endblock navbar %}
+
 
     {% block content %}
-      hola desde olo
     {% endblock content %}
-    
+
 
     {% block footer %}
-      <!-- PANEL SETTINGS -->
-
-    {% include "components/chat_settings.html" %}
-
-
-
-    <!-- INPUT IA -->
-
-    {% include "components/chat_input.html" %}
-    
     {% endblock footer %}
 
-        <script
+
+    <script
         src="{% static 'js/chat.js' %}"
+        defer
     ></script>
+
 </body>
+
 </html>

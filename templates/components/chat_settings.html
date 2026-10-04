@@ -1,262 +1,139 @@
-<!-- FONDO OSCURO / BLUR -->
+<!-- =========================================================
+     OVERLAY
+========================================================= -->
+
 <div
     class="chat-settings-overlay"
     id="chat-settings-overlay"
 ></div>
 
 
-<!-- PANEL SETTINGS -->
+<!-- =========================================================
+     PANEL SETTINGS
+========================================================= -->
+
 <aside
     class="chat-settings-panel"
     id="chat-settings-panel"
 >
 
+
     <!-- HEADER -->
-    <div class="settings-header">
+
+    <div class="settings-panel-header">
 
         <div>
-            <span class="settings-label">
-                AI
-            </span>
 
             <h2>
                 Configuración
             </h2>
+
+            <p>
+                Personalizá este chat.
+            </p>
+
         </div>
 
 
         <button
             type="button"
-            class="settings-close"
+            class="settings-close-button"
             id="close-chat-settings"
-            aria-label="Cerrar"
+            aria-label="Cerrar configuración"
         >
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-            >
-                <path d="M6 6L18 18"></path>
-                <path d="M18 6L6 18"></path>
-            </svg>
+            ×
         </button>
 
     </div>
 
 
-    <div class="settings-content">
+
+    <!-- =====================================================
+         MODO DE OLO
+    ====================================================== -->
+
+    <section class="settings-section">
 
 
-        <!-- MODO -->
-        <section class="settings-section">
+        <div class="settings-section-header">
 
-            <div class="settings-section-header">
-                <h3>Modo</h3>
+            <div>
+
+                <h3>
+                    Modo de Olo
+                </h3>
 
                 <p>
-                    Elegí cómo querés usar la IA.
+                    Elegí la personalidad para este chat.
                 </p>
+
             </div>
 
 
-            <div
-                class="mode-grid"
-                id="mode-selector"
+            <a
+                href="{% url 'olo_prompt_list' %}"
+                target="_blank"
+                class="manage-prompts-link"
             >
+                Gestionar Prompts ↗
+            </a>
+
+        </div>
+
+
+
+        <!-- =================================================
+             PROMPTS
+        ================================================== -->
+
+        <div
+            class="mode-grid"
+            id="mode-selector"
+        >
+
+
+            {% for prompt in prompts %}
+
 
                 <button
                     type="button"
-                    class="mode-card active"
-                    data-mode="general"
+                    class="mode-card {% if session.prompt and session.prompt.id == prompt.id %}active{% elif not session.prompt and forloop.first %}active{% endif %}"
+                    data-prompt-id="{{ prompt.id }}"
                 >
+
+
                     <span class="mode-icon">
                         ✦
                     </span>
 
+
                     <span class="mode-information">
-                        <strong>General</strong>
-                        <small>Conversación normal</small>
+
+                        <strong>
+                            {{ prompt.name }}
+                        </strong>
+
                     </span>
+
+
                 </button>
 
 
-                <button
-                    type="button"
-                    class="mode-card"
-                    data-mode="study"
-                >
-                    <span class="mode-icon">
-                        ◇
-                    </span>
-
-                    <span class="mode-information">
-                        <strong>Estudiar</strong>
-                        <small>Aprender paso a paso</small>
-                    </span>
-                </button>
+            {% empty %}
 
 
-                <button
-                    type="button"
-                    class="mode-card"
-                    data-mode="explain"
-                >
-                    <span class="mode-icon">
-                        ◎
-                    </span>
-
-                    <span class="mode-information">
-                        <strong>Explicar</strong>
-                        <small>Explicaciones claras</small>
-                    </span>
-                </button>
-
-
-                <button
-                    type="button"
-                    class="mode-card"
-                    data-mode="exam"
-                >
-                    <span class="mode-icon">
-                        ✓
-                    </span>
-
-                    <span class="mode-information">
-                        <strong>Examen</strong>
-                        <small>Preguntas y práctica</small>
-                    </span>
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- LONGITUD -->
-        <section class="settings-section">
-
-            <div class="settings-section-header">
-                <h3>Respuestas</h3>
-
-                <p>
-                    Controlá cuánto detalle querés.
+                <p class="empty-prompts">
+                    No tenés prompts creados.
                 </p>
-            </div>
 
 
-            <div class="segmented-control">
-
-                <button
-                    type="button"
-                    data-length="short"
-                >
-                    Breve
-                </button>
-
-                <button
-                    type="button"
-                    class="active"
-                    data-length="normal"
-                >
-                    Normal
-                </button>
-
-                <button
-                    type="button"
-                    data-length="detailed"
-                >
-                    Detallada
-                </button>
-
-            </div>
-
-        </section>
+            {% endfor %}
 
 
-        <!-- MEMORIA -->
-        <section class="settings-section">
-
-            <div class="setting-row">
-
-                <div>
-                    <strong>
-                        Memoria del chat
-                    </strong>
-
-                    <p>
-                        Permite usar mensajes anteriores como contexto.
-                    </p>
-                </div>
+        </div>
 
 
-                <label class="apple-switch">
+    </section>
 
-                    <input
-                        type="checkbox"
-                        id="memory-toggle"
-                        checked
-                    >
-
-                    <span class="switch-slider"></span>
-
-                </label>
-
-            </div>
-
-        </section>
-
-
-        <!-- INFORMACIÓN -->
-        <section class="settings-section">
-
-            <div class="setting-row setting-static">
-
-                <div>
-                    <strong>
-                        Modelo
-                    </strong>
-
-                    <p>
-                        Modelo utilizado actualmente.
-                    </p>
-                </div>
-
-                <span class="settings-value">
-                    AI
-                </span>
-
-            </div>
-
-        </section>
-
-
-        <!-- DANGER -->
-        <section class="settings-section settings-bottom">
-
-            <button
-                type="button"
-                class="clear-chat-button"
-                id="clear-chat-button"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                >
-                    <path d="M3 6H21"></path>
-                    <path d="M8 6V4H16V6"></path>
-                    <path d="M19 6L18 20H6L5 6"></path>
-                </svg>
-
-                Limpiar conversación
-            </button>
-
-        </section>
-
-
-    </div>
 
 </aside>

@@ -63,18 +63,39 @@ def track_action(request, action):
 
 class HomeView(View):
     def get(self, request):
-        # Tracking de visita
-        if not request.session.get('visit_tracked'):
+        
+        # 1. Capturamos el User-Agent (identificador del navegador/bot)
+        user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+        
+        # 2. Lista de palabras clave típicas de bots, scrapers y apps de mensajería
+        bot_keywords = [
+            'bot', 'crawler', 'spider', 'slurp', 'whatsapp', 'telegram', 
+            'facebookexternalhit', 'twitterbot', 'linkedinbot', 'discordbot', 
+            'preview', 'headless', 'lighthouse', 'vercel'
+        ]
+        
+        # 3. Comprobamos si el User-Agent contiene alguna de esas palabras
+        is_bot = any(keyword in user_agent for keyword in bot_keywords)
+
+        # 4. Tracking: Solo sumamos si NO es un bot y NO se registró antes en esta sesión
+        if not is_bot and not request.session.get('visit_tracked'):
             source = request.session.get('visit_source', 'Directo')
             today = timezone.now().date()
             metric, _ = AnalyticsMetric.objects.get_or_create(date=today, source=source)
             metric.visits += 1
             metric.save()
-            request.session['visit_tracked'] = True # Evita que si recarga la página sume otra visita
+            request.session['visit_tracked'] = True 
 
+        # 5. Cargamos la página normalmente (se la mostramos a todos, bots incluidos)
         profile = Profile.objects.first()
         projects = Project.objects.filter(is_public=True)
-        return render(request, "pages/index.html", {'profile': profile, 'projects': projects})
+
+        context = {
+            'profile': profile,
+            'projects': projects,
+        }
+
+        return render(request, "pages/index.html", context)
 
 
 
@@ -146,12 +167,6 @@ class NotesView(View):
     def get(self, request):
         return render(request, "pages/dashboard/notes.html")
 
-
-
-class OloView(View):
-
-    def get(self, request):
-        return render(request, "pages/OLO/base.html")
 
 
 

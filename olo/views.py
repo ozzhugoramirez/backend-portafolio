@@ -1,99 +1,65 @@
-import traceback
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from django.conf import settings
-from django.utils import timezone
-from google import genai
-from google.genai import types
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+from django.views.generic import ListView, CreateView, UpdateView
+from django.urls import reverse_lazy
+from django.views import View
+from .models import *
+from .services import get_olo_response
 
-from .models import DailyMemory
+class OloView(View):
+    def get(self, request, session_id=None):
+        if not session_id:
+            nueva_sesion = ChatSession.objects.create()
+            return redirect('olo_chat_detail', session_id=nueva_sesion.id)
 
-# Inicializamos el cliente una sola vez
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        session = get_object_or_404(ChatSession, id=session_id)
+        mensajes = list(session.messages.all().order_by('created_at'))
+        prompts = OloPrompt.objects.all() # Traemos todos tus prompts
 
-class OloChatView(APIView):
-    # AllowAny permite que la app móvil consuma la API sin token de login
-    permission_classes = [AllowAny]
+        context = {
+            'session': session,
+            'mensajes': mensajes,
+            'prompts': prompts, # Los pasamos al HTML
+        }
+        return render(request, "pages/OLO/index.html", context)
 
-    def post(self, request):
-        prompt = request.data.get('prompt')
-        device_id = request.data.get('device_id') 
-
-        if not prompt:
-            return Response({"error": "El prompt es obligatorio."}, status=400)
-
-        today = timezone.localdate()
-
-        # 1. Buscar o crear la memoria correcta (Web o Móvil)
-        if request.user.is_authenticated:
-            memory, created = DailyMemory.objects.get_or_create(
-                user=request.user,
-                date=today
-            )
-        elif device_id:
-            memory, created = DailyMemory.objects.get_or_create(
-                user=None,
-                device_id=device_id,
-                date=today
-            )
-        else:
-            return Response({"error": "Falta autenticación o un device_id."}, status=401)
-
-        # 2. Configurar la identidad y el tiempo de OLO
-        now = timezone.localtime()
-        fecha_hora_actual = now.strftime("%A, %d de %B de %Y a las %H:%M:%S")
+    def post(self, request, session_id):
+        session = get_object_or_404(ChatSession, id=session_id)
+        user_text = request.POST.get('message', '').strip()
         
-        system_instruction = (
-            "Tu nombre es OLO. Eres un amigo y asistente personal súper cercano, cálido y natural. Cero robótico.\n\n"
-            "REGLAS ESTRICTAS DE FORMATO:\n"
-            "1. Tus respuestas deben ser MUY breves, pensadas para leerse de un vistazo en la pantalla de un celular sin hacer scroll.\n"
-            "2. NUNCA uses listas largas, viñetas interminables ni bloques gigantes de texto.\n"
-            "3. Habla como en un chat uno a uno (estilo WhatsApp): respuestas cortas, directas y al pie.\n"
-            "4. Explica las cosas de forma increíble, fácil de entender, con ejemplos simples de la vida real.\n"
-            "5. Termina tus respuestas manteniendo la conversación viva, haciendo una pregunta corta si es necesario.\n\n"
-            f"Contexto temporal: {fecha_hora_actual}."
-        )
+        # ⚠️ IMPORTANTE: Capturamos el prompt seleccionado y lo guardamos en la sesión
+        prompt_id = request.POST.get('prompt_id')
+        if prompt_id:
+            try:
+                session.prompt = OloPrompt.objects.get(id=prompt_id)
+                session.save()
+            except OloPrompt.DoesNotExist:
+                pass
 
-        # 3. Reconstruir el historial usando diccionarios (A prueba de fallos)
-        contents = []
-        for msg in memory.history:
-            contents.append({
-                "role": msg['role'], 
-                "parts": [{"text": str(msg['text'])}]
-            })
-        
-        # Agregamos el mensaje nuevo del usuario
-        contents.append({
-            "role": "user", 
-            "parts": [{"text": str(prompt)}]
-        })
+        if user_text:
+            ChatMessage.objects.create(session=session, role='user', text=user_text)
+            ai_reply = get_olo_response(session, user_text)
+            ChatMessage.objects.create(session=session, role='model', text=ai_reply)
 
-        try:
-            # 4. Llamar a la API de Gemini
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                )
-            )
-            
-            olo_respuesta = response.text
+        return redirect('olo_chat_detail', session_id=session.id)
 
-            # 5. Guardar la nueva interacción en la base de datos
-            memory.history.append({"role": "user", "text": str(prompt)})
-            memory.history.append({"role": "model", "text": olo_respuesta})
-            memory.save()
 
-            return Response({
-                "respuesta": olo_respuesta,
-                "fecha_memoria": today
-            })
+# ==========================================
+# VISTAS DEL ADMINISTRADOR DE PROMPTS
+# ==========================================
+class PromptListView(ListView):
+    model = OloPrompt
+    template_name = 'pages/OLO/prompt_list.html'
+    context_object_name = 'prompts'
 
-        except Exception as e:
-            # Si falla algo, esto te devuelve el traceback completo en formato JSON
-            return Response({
-                "error_gemini": str(e), 
-                "traceback": traceback.format_exc()
-            }, status=500)
+class PromptCreateView(CreateView):
+    model = OloPrompt
+    fields = ['name', 'system_instruction']
+    template_name = 'pages/OLO/prompt_form.html'
+    success_url = reverse_lazy('olo_prompt_list')
+
+class PromptUpdateView(UpdateView):
+    model = OloPrompt
+    fields = ['name', 'system_instruction']
+    template_name = 'pages/OLO/prompt_form.html'
+    success_url = reverse_lazy('olo_prompt_list')

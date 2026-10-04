@@ -1,0 +1,36 @@
+<!-- components/olo_main_screen.html -->
+<div class="olo-main-wrapper">
+    
+    <!-- PANTALLA NEGRA PRINCIPAL -->
+    <div class="olo-main-screen" id="main-screen">
+        <div class="olo-typing-text">
+            <span id="typewriter-output"></span><span class="cursor"></span>
+        </div>
+
+        <button id="btn-expand" class="screen-btn" onclick="expandScreen()">Leer más ↘</button>
+        <button id="btn-close" class="screen-btn" onclick="closeScreen()">Cerrar ✕</button>
+    </div>
+
+    <!-- ZONA DE ACCIONES (Centrada y abajo) -->
+    <div class="olo-action-bar">
+        
+        <div class="action-group" id="fixed-actions">
+            <button class="action-pill action-fixed" onclick="copiarMensaje()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copiar
+            </button>
+            <button class="action-pill action-fixed">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Resumir
+            </button>
+        </div>
+
+        <div class="action-divider"></div>
+
+        <div class="action-group" id="dynamic-actions">
+            <!-- Botones dinámicos inyectados por JS -->
+        </div>
+
+    </div>
+
+</div>

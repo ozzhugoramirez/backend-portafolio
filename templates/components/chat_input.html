@@ -3,12 +3,17 @@
     <form
         class="study-input"
         method="POST"
+        action="{% url 'olo_chat_detail' session.id %}"
         id="chat-form"
     >
+
         {% csrf_token %}
 
 
-        <!-- TEXTAREA -->
+        <!-- ==================================================
+             TEXTAREA
+        ================================================== -->
+
         <textarea
             class="study-textarea"
             name="message"
@@ -19,13 +24,21 @@
         ></textarea>
 
 
-        <!-- VALORES QUE RECIBE DJANGO -->
+        <!-- ==================================================
+             PROMPT SELECCIONADO
+        ================================================== -->
+
         <input
             type="hidden"
-            name="chat_mode"
-            id="chat-mode-input"
-            value="general"
+            name="prompt_id"
+            id="prompt-id-input"
+            value="{% if session.prompt %}{{ session.prompt.id }}{% elif prompts %}{{ prompts.0.id }}{% endif %}"
         >
+
+
+        <!-- ==================================================
+             LONGITUD
+        ================================================== -->
 
         <input
             type="hidden"
@@ -33,6 +46,11 @@
             id="response-length-input"
             value="normal"
         >
+
+
+        <!-- ==================================================
+             MEMORIA
+        ================================================== -->
 
         <input
             type="hidden"
@@ -42,16 +60,22 @@
         >
 
 
-        <!-- ACCIONES -->
+        <!-- ==================================================
+             BOTONES
+        ================================================== -->
+
         <div class="study-actions">
 
-            <!-- OPCIONES / SETTINGS -->
+
+            <!-- SETTINGS -->
+
             <button
                 type="button"
                 class="study-options-button"
                 id="open-chat-settings"
                 aria-label="Opciones del chat"
             >
+
                 <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -60,6 +84,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                 >
+
                     <path d="M4 7H14"></path>
                     <path d="M18 7H20"></path>
 
@@ -78,11 +103,14 @@
                         cy="17"
                         r="2"
                     ></circle>
+
                 </svg>
+
             </button>
 
 
             <!-- ENVIAR -->
+
             <button
                 type="submit"
                 class="study-send"
@@ -91,7 +119,8 @@
                 disabled
             >
 
-                <!-- ESTADO VACÍO -->
+                <!-- ICONO VACÍO -->
+
                 <svg
                     class="send-icon-empty"
                     viewBox="0 0 24 24"
@@ -101,13 +130,20 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                 >
-                    <path d="M12 3L13.3 8.7L19 10L13.3 11.3L12 17L10.7 11.3L5 10L10.7 8.7L12 3Z"></path>
 
-                    <path d="M18.5 15L19.2 17.8L22 18.5L19.2 19.2L18.5 22L17.8 19.2L15 18.5L17.8 17.8L18.5 15Z"></path>
+                    <path
+                        d="M12 3L13.3 8.7L19 10L13.3 11.3L12 17L10.7 11.3L5 10L10.7 8.7L12 3Z"
+                    ></path>
+
+                    <path
+                        d="M18.5 15L19.2 17.8L22 18.5L19.2 19.2L18.5 22L17.8 19.2L15 18.5L17.8 17.8L18.5 15Z"
+                    ></path>
+
                 </svg>
 
 
-                <!-- ESTADO CON TEXTO -->
+                <!-- ICONO ACTIVO -->
+
                 <svg
                     class="send-icon-active"
                     viewBox="0 0 24 24"
@@ -117,8 +153,10 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                 >
+
                     <path d="M12 18V6"></path>
                     <path d="M7 11L12 6L17 11"></path>
+
                 </svg>
 
             </button>

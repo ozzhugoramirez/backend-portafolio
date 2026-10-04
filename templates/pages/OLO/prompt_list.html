@@ -1,0 +1,25 @@
+{% extends "pages/OLO/base.html" %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 60px auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h1 style="font-size: 32px; font-weight: 700; margin: 0; letter-spacing: -0.04em;">Tus Prompts</h1>
+        <a href="{% url 'olo_prompt_create' %}" style="background: #1d1d1f; color: white; padding: 10px 20px; border-radius: 999px; text-decoration: none; font-size: 14px; font-weight: 600;">+ Nuevo Prompt</a>
+    </div>
+
+    <div style="display: grid; gap: 20px;">
+        {% for prompt in prompts %}
+            <div style="background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 20px; padding: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                <div>
+                    <h3 style="margin: 0 0 8px 0; font-size: 18px;">{{ prompt.name }}</h3>
+                    <p style="margin: 0; color: #86868b; font-size: 14px; max-width: 500px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ prompt.system_instruction }}</p>
+                </div>
+                <a href="{% url 'olo_prompt_update' prompt.id %}" style="color: #0071e3; font-weight: 600; font-size: 14px; text-decoration: none; padding: 8px 16px; background: rgba(0,113,227,0.08); border-radius: 999px;">Editar</a>
+            </div>
+        {% empty %}
+            <p style="color: #86868b; text-align: center; padding: 40px;">Aún no tenés comportamientos creados. Creá el primero.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

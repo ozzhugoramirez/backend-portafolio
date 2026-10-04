@@ -1,7 +1,13 @@
 from django.urls import path
-from .views import OloChatView
+from .views import OloView, PromptListView, PromptCreateView, PromptUpdateView
 
 urlpatterns = [
-    # Puedes cambiar 'chat/' por la ruta que prefieras
-    path('chat/', OloChatView.as_view(), name='olo_chat'),
+    # Rutas del Chat
+    path('', OloView.as_view(), name='olo_inicio'),
+    path('chat/<uuid:session_id>/', OloView.as_view(), name='olo_chat_detail'),
+    
+    # Rutas del Administrador de Prompts
+    path('prompts/', PromptListView.as_view(), name='olo_prompt_list'),
+    path('prompts/nuevo/', PromptCreateView.as_view(), name='olo_prompt_create'),
+    path('prompts/<int:pk>/editar/', PromptUpdateView.as_view(), name='olo_prompt_update'),
 ]

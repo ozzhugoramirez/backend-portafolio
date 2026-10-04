@@ -60,11 +60,6 @@ urlpatterns = [
         name="notes"
     ),
 
-    path(
-        "olo/",
-        OloView.as_view(),
-        name="olo"
-    ),
    
 ]
 if settings.DEBUG:
