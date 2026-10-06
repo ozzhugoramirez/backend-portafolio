@@ -59,6 +59,12 @@ urlpatterns = [
         NotesView.as_view(),
         name="notes"
     ),
+    path(
+        "api/scanner/",
+        include(
+            "bazar.urls"
+        )
+    ),
 
    
 ]
