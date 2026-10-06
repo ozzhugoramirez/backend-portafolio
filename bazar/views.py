@@ -186,12 +186,18 @@ class ProductByBarcodeView(
 # BUSCAR POR NOMBRE / MARCA / CÓDIGO / CATEGORÍA / PROVEEDOR
 # ============================================================
 
+
 class ProductSearchView(
     PublicScannerMixin,
     generics.ListAPIView
 ):
 
     serializer_class = ProductSerializer
+
+    # IMPORTANTE:
+    # queremos devolver un array JSON directo,
+    # no una respuesta paginada.
+    pagination_class = None
 
 
     def get_queryset(self):
@@ -255,6 +261,8 @@ class ProductSearchView(
 
         return products[:30]
 
+
+        
 
 # ============================================================
 # VER / ACTUALIZAR PRODUCTO
